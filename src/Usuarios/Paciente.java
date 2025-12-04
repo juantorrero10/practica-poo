@@ -1,9 +1,9 @@
 package Usuarios;
 
 import Citas.Cita;
-import Enumerados.Especialidades;
+import Enumeradores.Especialidades;
 import GestionHistorial.Historial;
-import Usuarios.Usuario;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;

@@ -1,4 +1,4 @@
-package Enumerados;
+package Enumeradores;
 
 public enum TipoPreescripcion {
     PUNTUAL,

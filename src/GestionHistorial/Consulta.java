@@ -1,9 +1,6 @@
 package GestionHistorial;
 
-import Enumerados.Centros;
-import Enumerados.Especialidades;
-import Enumerados.TipoConsulta;
-import Enumerados.TipoInforme;
+import Enumeradores.*;
 import Medicacion.Medicamento;
 import Usuarios.Medico;
 
@@ -11,9 +8,6 @@ import javax.management.InvalidAttributeValueException;
 import java.time.LocalDate;
 
 public class Consulta {
-
-
-
 
     private final LocalDate fecha;
     private final String motivo;

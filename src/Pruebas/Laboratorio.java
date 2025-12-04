@@ -1,7 +1,7 @@
 package Pruebas;
 
 
-import Enumerados.Centros;
+import Enumeradores.Centros;
 
 import java.time.LocalDateTime;
 

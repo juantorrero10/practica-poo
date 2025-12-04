@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Historial {
-    private List<Consulta> consultas;
-    private List<Imagen> pruebasImagen;
-    private List<Laboratorio> pruebasLaboratorio;
+    private ArrayList<Consulta> consultas;
+    private ArrayList<Imagen> pruebasImagen;
+    private ArrayList<Laboratorio> pruebasLaboratorio;
+
 
     public Historial() {
         consultas = new ArrayList<>();
@@ -25,7 +26,7 @@ public class Historial {
     public List<Medicamento> getMedicamentosActivos() {
         ArrayList<Medicamento> ret = new ArrayList<>();
 
-        for (Consulta c :  consultas) {
+        for (Consulta c : consultas) {
             if (c.getPreescripcion().estaActivo()) {
                 ret.add(c.getPreescripcion());
             }
@@ -34,8 +35,8 @@ public class Historial {
         return ret;
     }
 
-    // ############################## apartado Pruebas ##################################
 
+    // Añadir elementos a los ArrayLists
     public void agregarImagen(Imagen pi) {
         pruebasImagen.add(pi);
     }
@@ -47,8 +48,8 @@ public class Historial {
     public List<Imagen> getImagen() {
         return pruebasImagen;
     }
-
     public List<Laboratorio> getLaboratorio() {
         return pruebasLaboratorio;
     }
+    public List<Consulta> getConsultas() { return consultas; }
 }

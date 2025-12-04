@@ -8,11 +8,11 @@ import java.time.format.DateTimeFormatter;
 
 public class Cita {
     private LocalDateTime fechaHora;
-    private LocalDate fecha;
-    private boolean anulada = false;
-    private String causaAnulacion;
     private Paciente paciente;
     private Medico medico;
+
+    private boolean anulada;
+    private String causaAnulacion;
     private LocalDateTime fechaCancelacion;
 
 
@@ -20,6 +20,7 @@ public class Cita {
         this.paciente = paciente;
         this.medico = medico;
         this.fechaHora = fechaHora;
+        this.anulada = false;
         medico.anadirCita(this);
     }
 
@@ -31,7 +32,7 @@ public class Cita {
         this.paciente.eliminarCita(this);
     }
 
-    public void modificarFechaHora(LocalDateTime nueva){
+    public void reagendar(LocalDateTime nueva){
         this.fechaHora = nueva;
     }
 
@@ -43,10 +44,10 @@ public class Cita {
     }
 
     public String notificar2Dias(){
-        LocalDateTime dia= LocalDateTime.now().minusDays(2);
+        LocalDateTime dia= LocalDateTime.now().plusDays(2);
 
         for(Cita c: this.paciente.getArrayCitas()){
-            if(c.fechaHora.isAfter(dia)){
+            if(c.fechaHora.isBefore(dia)){
                 return "Recuerde su cita "+c.toString();
             }
         }
@@ -94,6 +95,6 @@ public class Cita {
     public String toString() {
         DateTimeFormatter f =DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm ");
 
-        return " Cita:" + fechaHora.format(f) + ",Paciente: " + paciente.toString() + ", Medico: " + medico.toString() ;
+        return " Cita:" + fechaHora.format(f) + "\nPaciente: " + paciente.toString() + "\nMedico: " + medico.toString() ;
     }
 }

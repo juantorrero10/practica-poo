@@ -1,6 +1,6 @@
 package Usuarios;
 
-import Enumerados.Centros;
+import Enumeradores.Centros;
 
 public class AdminCentroSalud extends Usuario{
 

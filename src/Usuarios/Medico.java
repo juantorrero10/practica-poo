@@ -1,7 +1,7 @@
 package Usuarios;
 
 import Citas.Cita;
-import Enumerados.*;
+import Enumeradores.*;
 import Medicacion.Medicamento;
 
 import java.time.LocalDate;
@@ -14,8 +14,8 @@ public class Medico extends Usuario{
 
     private static final int MAXCITASDIARIAS = 20;
     private ArrayList<Cita> agendaCitas;
-    private  Especialidades especialidad;
-    private  Centros c;
+    private Especialidades especialidad;
+    private Centros c;
 
 
 
@@ -30,17 +30,6 @@ public class Medico extends Usuario{
     public Especialidades getEspecialidad() {
         return especialidad;
     }
-
-
-
-    //################################# Metodo para recetar medicamentos a pacientes ####################################
-
-    public boolean recetarMedicamento(Medicamento medicamento, Paciente paciente){
-        if(paciente.getHistorial().pertenece(medicamento)) return false;
-        paciente.getHistorial().agregarMedicamento(medicamento);
-        return true;
-    }
-
 
 
     public boolean anadirCita(Cita c){
@@ -66,9 +55,6 @@ public class Medico extends Usuario{
             System.out.println(cita.toString());
         }
     }
-
-
-
 
 
     public LocalTime encontrarPrimeraHoraDisponible(LocalDate fecha) {

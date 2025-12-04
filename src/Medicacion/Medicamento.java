@@ -1,7 +1,7 @@
 package Medicacion;
 
 
-import Enumerados.TipoPreescripcion;
+import Enumeradores.TipoPreescripcion;
 
 import javax.management.InvalidAttributeValueException;
 import java.time.LocalDate;

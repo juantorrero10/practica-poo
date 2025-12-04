@@ -21,9 +21,9 @@ public abstract class Usuario {
     }
 
 
-    public boolean modificarFechaHora(Cita cita, LocalDateTime fechaHora) {
+    public boolean reagendarCita(Cita cita, LocalDateTime fechaHora) {
         if (cita != null && !cita.isAnulada()) {
-            cita.modificarFechaHora(fechaHora);
+            cita.reagendar(fechaHora);
             return true;
         }
         return false;
@@ -64,12 +64,11 @@ public abstract class Usuario {
 
     @Override
     public boolean equals(Object o){
-        if(this==o) return true;
 
         if(o==null || this.getClass()!=o.getClass()) return false;
 
         Usuario u = (Usuario) o;
 
-        return (this.dni.equals(u.dni));
+        return (this.cipa == u.cipa);
     }
 }

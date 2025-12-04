@@ -1,4 +1,4 @@
-package Enumerados;
+package Enumeradores;
 
 public enum Centros {
     HOSPITAL_UNIVERSITARIO_LA_PAZ,
