@@ -136,7 +136,7 @@ public class Medico extends Usuario{
 
                 LocalDateTime nuevaFechaHora = cita.getFechaHora().with(nuevaFecha);
                 LocalDateTime fechaAntigua = cita.getFechaHora();
-                cita.modificarFechaHora(nuevaFechaHora);
+                cita.reagendar(nuevaFechaHora);
                 cita.notificarReagendar(fechaAntigua);
                 citasMovidas++;
             }

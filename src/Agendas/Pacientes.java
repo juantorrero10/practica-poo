@@ -1,12 +1,15 @@
 package Agendas;
 
+import Reestricion.Reestricion;
 import Usuarios.Paciente;
+import Usuarios.Usuario;
 
+import java.rmi.AccessException;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class Pacientes {
-    private ArrayList<Paciente> pacientes;
+    private static ArrayList<Paciente> pacientes;
 
     public Pacientes() {
         //todo: cagar archivo
@@ -20,7 +23,8 @@ public class Pacientes {
         return null;
     }
 
-    public boolean agregarPaciente(Paciente p) {
+    public boolean agregarPaciente(Usuario u, Paciente p) throws AccessException {
+        Reestricion.adminCentro(u, "Pacientes.agregarPaciente");
         if (this.pacientes.contains(p)) {this.pacientes.add(p); return true;}
         return false;
     }

@@ -1,12 +1,14 @@
 package Agendas;
 
 import Citas.Cita;
-import Usuarios.Medico;
-import Usuarios.Paciente;
-import Usuarios.Usuario;
+import Reestricion.Reestricion;
+import Usuarios.*;
 
 
+import java.nio.file.AccessDeniedException;
+import java.rmi.AccessException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,8 +39,15 @@ public class AgendaCitas {
         return getCitaUsuario(medico);
     }
 
-    public void reagendarCitasDia(Usuario usuario, LocalDate fecha, LocalDate nueva) {
-        
+    public void reagendarCitasDia(Usuario usuario, LocalDate fecha, LocalDateTime nueva)
+            throws AccessException
+    {
+        Reestricion.noPaciente(usuario, "AgendaCitas.reagendarCitasDia");
+
+        for (Cita c : citas) {
+            if (c.getFechaHora().toLocalDate().equals(fecha)) {
+                c.reagendar(nueva);}
+        }
     }
 
 }

@@ -1,44 +1,74 @@
 package MainPruebas;
 
+import Agendas.AgendaConsultas;
 import Agendas.Pacientes;
 import Agendas.Plantilla;
+import GestionHistorial.Consulta;
+import Medicacion.Medicamento;
+import Reestricion.Reestricion;
 import Usuarios.*;
 import Enumeradores.*;
 import Citas.Cita;
+
+import javax.management.InvalidAttributeValueException;
+import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class Main {
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws AccessException, InvalidAttributeValueException {
 
         System.out.println(">>> INICIANDO SISTEMA DE PRUEBAS <<<");
 
         // Inicialización obligatoria del sistema
         Plantilla plantilla = new Plantilla();
         Pacientes listaPacientes = new Pacientes();
+        AgendaConsultas agendaConsultas = new AgendaConsultas();
 
-        // ===== creación de usuarios =====
+        //Usuarios de autentificacion
+        Admin su = new Admin("00000000T", 0);
+        Paciente p = new Paciente("Paciente prueba", null, 0, "1111111B", 1);
+        Medico m = new Medico("2222222C", 2, Especialidades.GENERAL, Centros.HOSPITAL_UNIVERSITARIO_12_DE_OCTUBRE);
+        AdminCentroSalud ac = new AdminCentroSalud("3333333D", 3, Centros.HOSPITAL_UNIVERSITARIO_DE_GETAFE);
+
+        //"Autentificar" como Admin
+        Admin u = su;
+        //Paciente u = p;
+        //Medico u = m;
+        //AdminCentroSalud u = ac
+
         System.out.println("\n[1] Preparando datos iniciales...");
 
         Medico m1 = new Medico("11112222A", 101, Especialidades.CARDIOLOGIA, Centros.HOSPITAL_UNIVERSITARIO_DE_FUENLABRADA);
         Medico m2 = new Medico("33334444Z", 102, Especialidades.PEDIATRIA, Centros.HOSPITAL_UNIVERSITARIO_PRINCIPE_DE_ASTURIAS);
-        plantilla.agregarMedico(m1);
-        plantilla.agregarMedico(m2);
+        plantilla.agregarMedico(u, m1);
+        plantilla.agregarMedico(u, m2);
 
 
         Paciente pa1 = new Paciente("Laura Sánchez", "Calle Río 21", 612334455, "98765432L", 5001);
         Paciente pa2 = new Paciente("Pedro Martín", "Avenida Verde 13", 698765432, "11223344X", 5002);
-        listaPacientes.agregarPaciente(pa1);
-        listaPacientes.agregarPaciente(pa2);
+        listaPacientes.agregarPaciente(u, pa1);
+        listaPacientes.agregarPaciente(u, pa2);
 
         AdminCentroSalud administrador = new AdminCentroSalud("44556677M", 4001, Centros.HOSPITAL_UNIVERSITARIO_TORREJON);
+        plantilla.agregarAdministradorCentro(u, administrador);
 
         System.out.println("Usuarios registrados correctamente.\n");
 
         // ===== pruebas administrador =====
         System.out.println("[2] Comprobando funciones del administrador...");
+
         System.out.println("Paciente original: " + pa1);
+
+
+        Consulta c = new Consulta(LocalDate.now(), "colonoscopia", TipoConsulta.PRESENCIAL, TipoInforme.ALTA, Centros.HOSPITAL_UNIVERSITARIO_DE_MOSTOLES, m1);
+        c.recetarMedicamento(u, null);
+        agendaConsultas.agregarConsulta(u, c);
+        pa1.agregarAlHistorial(u, c);
+
+
 
         administrador.setNombre(pa1, "Laura Beatriz Sánchez");
         administrador.setDireccion(pa1, "Camino Alto 77");
@@ -106,7 +136,7 @@ public class Main {
         System.out.println("[6] Acciones generales del usuario...");
 
         LocalDateTime otraFecha = LocalDateTime.now().plusDays(7);
-        System.out.println("Modificando fecha de ct2: " + pa1.modificarFechaHora(ct2, otraFecha));
+        System.out.println("Modificando fecha de ct2: " + pa1.reagendarCita(ct2, otraFecha));
 
         System.out.println("Cancelación de cita ct2 por el paciente: " + pa1.cancelarCita(ct2, "Cambio personal"));
 
@@ -115,6 +145,5 @@ public class Main {
         System.out.println("pa1 = pa2 ? → " + pa1.equals(pa2));
 
         System.out.println("\n>>> PRUEBAS FINALIZADAS <<<");
-    }
 
 }

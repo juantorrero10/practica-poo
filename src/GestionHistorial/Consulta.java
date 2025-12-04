@@ -2,9 +2,12 @@ package GestionHistorial;
 
 import Enumeradores.*;
 import Medicacion.Medicamento;
+import Reestricion.Reestricion;
 import Usuarios.Medico;
+import Usuarios.Usuario;
 
 import javax.management.InvalidAttributeValueException;
+import java.rmi.AccessException;
 import java.time.LocalDate;
 
 public class Consulta {
@@ -42,6 +45,12 @@ public class Consulta {
             this.tipoConsulta = tipoConsulta;
         }
     }
+
+    public void recetarMedicamento(Usuario u, Medicamento med) throws AccessException {
+        Reestricion.medico(u, "Consulta.recetarMedicamento");
+        this.preescripcion = med;
+    }
+
 
     @Override
     public String toString() {

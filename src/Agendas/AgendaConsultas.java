@@ -1,8 +1,11 @@
 package Agendas;
 
 import GestionHistorial.Consulta;
+import Reestricion.Reestricion;
 import Usuarios.Paciente;
+import Usuarios.Usuario;
 
+import java.rmi.AccessException;
 import java.util.ArrayList;
 
 public class AgendaConsultas {
@@ -12,7 +15,8 @@ public class AgendaConsultas {
         consultas = new ArrayList<>();
     }
 
-    public void añadirConsulta(Consulta consulta){
+    public void agregarConsulta(Usuario u, Consulta consulta) throws AccessException {
+        Reestricion.noPaciente(u, "AgendaConsultas.agregarConsulta");
         consultas.add(consulta);
     }
 

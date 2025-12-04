@@ -1,9 +1,14 @@
 package Usuarios;
 
+import Agendas.Pacientes;
+import Agendas.Plantilla;
 import Citas.Cita;
 import Enumeradores.Especialidades;
+import GestionHistorial.Consulta;
 import GestionHistorial.Historial;
+import Reestricion.Reestricion;
 
+import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -27,11 +32,14 @@ public class Paciente extends Usuario{
         this.direccion=direccion;
         this.telefono=telefono;
         arrayCitas = new ArrayList<>();
-        ListaPaciente.añadirListaPaciente(this);
+
+
     }
 
-    public boolean asignarCitaAutomatica(Especialidades esp){
-        Medico m = Plantilla.encontrarEspecialidadMedico(esp);
+    public boolean asignarCitaAutomatica(Usuario u, Especialidades esp) throws AccessException {
+        Reestricion.noPaciente(u, "Paciente.asignarCitaAutomática");
+
+        Medico m = Plantilla.encontrarEspecilistaAleatorio(esp);
         LocalDate[] array = new LocalDate[5];
         Scanner scanner = new Scanner(System.in);
 
@@ -105,6 +113,11 @@ public class Paciente extends Usuario{
 
         arrayCitas.set(posicion, nueva);
         return true;
+    }
+
+    public void agregarAlHistorial(Usuario u, Consulta c) throws AccessException {
+        Reestricion.noPaciente(u, "Paciente.agregarAlHistorial");
+        historial.agregarConsulta(c);
     }
 
     public boolean eliminarCita(Cita c){
