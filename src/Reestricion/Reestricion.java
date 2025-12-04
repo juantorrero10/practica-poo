@@ -1,5 +1,6 @@
 package Reestricion;
 
+import Enumeradores.Centros;
 import Usuarios.Admin;
 import Usuarios.AdminCentroSalud;
 import Usuarios.Medico;
@@ -10,7 +11,7 @@ import java.rmi.AccessException;
 public class Reestricion {
 
     private static void lanzarExcepcion(String accion, String admitidos) throws AccessException {
-        throw new AccessException("Acceso denegado para la accion: "+accion+"(), Solo: "+admitidos+" pueden realizar esta accion.");
+        throw new AccessException("Acceso denegado para la accion: "+accion+"(), solo: "+admitidos+" pueden realizar esta accion.");
     }
 
     public static void noPaciente(Usuario u, String accion)

@@ -1,6 +1,7 @@
 package Enumeradores;
 
 public enum Especialidades {
+    NO_ESPECIFICADO,
     ENFERMERO,
     GENERAL,
     CARDIOLOGIA,

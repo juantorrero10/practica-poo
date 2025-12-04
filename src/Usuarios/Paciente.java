@@ -18,8 +18,8 @@ import java.util.Scanner;
 
 public class Paciente extends Usuario{
 
-    private final String nombreCompleto;
-    private final String direccion;
+    private String nombreCompleto;
+    private String direccion;
     private long telefono;
     private ArrayList<Cita> arrayCitas; // historial de citas del paciente
     private Historial historial;
@@ -32,67 +32,40 @@ public class Paciente extends Usuario{
         this.direccion=direccion;
         this.telefono=telefono;
         arrayCitas = new ArrayList<>();
-
+        this.historial = new Historial();
 
     }
 
-    public boolean asignarCitaAutomatica(Usuario u, Especialidades esp) throws AccessException {
+    public Cita asignarCitaAutomatica(Usuario u, LocalDate inicio, Especialidades esp, Plantilla p) throws AccessException {
         Reestricion.noPaciente(u, "Paciente.asignarCitaAutomática");
 
-        Medico m = Plantilla.encontrarEspecilistaAleatorio(esp);
-        LocalDate[] array = new LocalDate[5];
-        Scanner scanner = new Scanner(System.in);
-
-        if(m!=null){
-            LocalDate diaBuscado = LocalDate.now();
-            for(int i=0; i < 5; i++){						//Usamos dia buscado porque se va aumentando en cada iteración
-                diaBuscado = m.encontrarProximoDiaDisponible(diaBuscado, 1);
-                array[i] = diaBuscado;
-            }
-        } else {
-            System.out.println("No se encontró médico para esa especialidad.");
-            return false;
+        Medico m = p.encontrarEspecilistaAleatorio(esp);
+        if (m == null) {
+            System.err.println("No existen medicos especialistas disponibles.");
+            return null;
         }
 
-        System.out.println("--- Fechas disponibles ---");
-        for (int i = 0; i < 5; i++) {
-            System.out.println("Opcion numero "+ i +": "+ array[i]);
+        LocalDate dia = m.encontrarProximoDiaDisponible(LocalDate.now(), 0);
+        if (dia == null) {
+            return null;
+        }
+        LocalTime hora = m.encontrarPrimeraHoraDisponible(dia);
+        if (hora == null) {
+            return null;
+        }
+        LocalDateTime horario = LocalDateTime.of(dia, hora);
+        Cita c = new Cita(horario, this, m);
+        if (c.getFechaHora() == null) {
+            System.err.println("No se pudo encontrar un dia y una hora para asignar la cita.");
+            return null;
         }
 
-        System.out.println("Escoja la opcion deseada (0-4):");
-        int j = scanner.nextInt();
-
-        if (j < 0 || j >= 5) {
-            System.out.println("Opción no válida.");
-            return false;
+        if (!m.anadirCita(u, c)) {
+            System.err.println("No se pudo asignar la cita.");
+            return null;
         }
-
-        LocalDate fechaElegida = array[j];
-
-        LocalTime horaAsignada = m.encontrarPrimeraHoraDisponible(fechaElegida);
-
-
-        if (horaAsignada == null) {
-            System.out.println("Error: El día seleccionado (" + fechaElegida + ") se ha llenado. Inténtelo de nuevo.");
-            return false;
-        }
-
-        //Combinamos la fecha elegida y la hora encontrada
-        LocalDateTime fechaHoraCita = LocalDateTime.of(fechaElegida, horaAsignada);
-
-        Cita asignada = new Cita(fechaHoraCita, this, m);
-
-        this.arrayCitas.add(asignada);
-        boolean anadidaMedico = !m.anadirCita(asignada);
-
-        if (anadidaMedico) {
-            System.out.println("Cita asignada con éxito: " + asignada.toString());
-            return true;
-        } else {
-            System.out.println("Error: El médico no pudo aceptar la cita (agenda llena).");
-            this.arrayCitas.remove(asignada);
-            return false;
-        }
+        if (!arrayCitas.contains(c))arrayCitas.add(c);
+        return c;
     }
 
 
@@ -117,7 +90,7 @@ public class Paciente extends Usuario{
 
     public void agregarAlHistorial(Usuario u, Consulta c) throws AccessException {
         Reestricion.noPaciente(u, "Paciente.agregarAlHistorial");
-        historial.agregarConsulta(c);
+        if (!historial.getConsultas().contains(c))historial.agregarConsulta(c);
     }
 
     public boolean eliminarCita(Cita c){
@@ -129,11 +102,13 @@ public class Paciente extends Usuario{
         return true;
     }
 
+    // Geters y el setTelefono publicos para el paciente
+
     public ArrayList<Cita> getArrayCitas() {
         return arrayCitas;
     }
 
-    public String getNombre(){
+    public String getNombreCompleto(){
         return this.nombreCompleto;
     }
 
@@ -149,6 +124,19 @@ public class Paciente extends Usuario{
     public void setTelefono(long telefono){
         this.telefono = telefono;
     }
+
+    // Setters que solo pueden ejecutar administradores de centro o administardores generales
+
+    public void setDireccion(Usuario u,String direccion) throws AccessException{
+        Reestricion.adminCentro(u, "Paciente.setDireccion");
+        this.direccion = direccion;
+    }
+
+    public void setNombreCompleto(Usuario u,String nombreCompleto) throws AccessException{
+        Reestricion.adminCentro(u,"Paciente.setNombreCompleto");
+        this.nombreCompleto = nombreCompleto;
+    }
+
 
 
     @Override

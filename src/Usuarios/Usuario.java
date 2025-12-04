@@ -9,14 +9,13 @@ import java.util.Objects;
 
 public abstract class Usuario {
 
-    private String dni;
-    private long cipa;
+    protected String dni;
+    protected long cipa;
 
     public Usuario(String dni, long cipa){
 
         this.dni=dni;
         this.cipa=cipa;
-        Plantilla.añadirPlantilla(this);
 
     }
 

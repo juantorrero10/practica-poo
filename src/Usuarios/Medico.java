@@ -3,19 +3,22 @@ package Usuarios;
 import Citas.Cita;
 import Enumeradores.*;
 import Medicacion.Medicamento;
+import Reestricion.Reestricion;
 
+import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 public class Medico extends Usuario{
 
     private static final int MAXCITASDIARIAS = 20;
     private ArrayList<Cita> agendaCitas;
     private Especialidades especialidad;
-    private Centros c;
+    private Centros centro;
 
 
 
@@ -23,7 +26,7 @@ public class Medico extends Usuario{
 
         super(DNI,CIPA);
         this.especialidad = especialidad;
-        this.c = c;
+        this.centro = c;
         agendaCitas = new ArrayList<>();
     }
 
@@ -31,21 +34,22 @@ public class Medico extends Usuario{
         return especialidad;
     }
 
+    public Centros getCentro() {
+        return this.centro;
+    }
 
-    public boolean anadirCita(Cita c){
-        if(c==null) return false;
+    public List<Cita> getAgenda() {
+        return agendaCitas;
+    }
 
-        if(this.agendaCitas.contains(c)) return false;
 
-        int aux = c.getFechaHora().getDayOfYear();
-        int indice = 0;
-
-        for(Cita cita: agendaCitas){
-            if(cita.getFechaHora().getDayOfYear()==aux) indice++;
+    public boolean anadirCita(Usuario u, Cita c) throws AccessException {
+        Reestricion.noPaciente(u, "Medico.anadirCita");
+        if (c == null) return false;
+        if (getCitasParaDia(c.getFechaHora().toLocalDate()) >= MAXCITASDIARIAS ||
+            agendaCitas.contains(c)) {
+            return false;
         }
-
-        if(indice>=MAXCITASDIARIAS) return false;
-
         agendaCitas.add(c);
         return true;
     }
@@ -56,6 +60,17 @@ public class Medico extends Usuario{
         }
     }
 
+    public LocalDate encontrarProximoDiaDisponible(LocalDate inicio, int citasAMover) {
+        // Empezamos a buscar desde el día siguiente a la fecha indicada.
+        LocalDate fechaActual = inicio.plusDays(1);
+
+        // El bucle comprueba si citas existentes + citas a mover exceden el límite de 20 diarias.
+        while((getCitasParaDia(fechaActual) + citasAMover) >= MAXCITASDIARIAS) {
+            fechaActual = fechaActual.plusDays(1); // Avanza al día siguiente
+        }
+
+        return fechaActual;
+    }
 
     public LocalTime encontrarPrimeraHoraDisponible(LocalDate fecha) {
         if (getCitasParaDia(fecha) >= MAXCITASDIARIAS) {
@@ -97,18 +112,6 @@ public class Medico extends Usuario{
         }
 
         return contador;
-    }
-
-    public LocalDate encontrarProximoDiaDisponible(LocalDate inicio, int citasAMover) {
-        // Empezamos a buscar desde el día siguiente a la fecha antigua.
-        LocalDate fechaActual = inicio.plusDays(1);
-
-        // El bucle comprueba si citas existentes + citas a mover exceden el límite de 20 diarias.
-        while((getCitasParaDia(fechaActual) + citasAMover) > MAXCITASDIARIAS) {
-            fechaActual = fechaActual.plusDays(1); // Avanza al día siguiente
-        }
-
-        return fechaActual;
     }
 
     public int reagendarCitas(LocalDate antigua){
@@ -159,7 +162,7 @@ public class Medico extends Usuario{
 
     @Override
     public String toString() {
-        return super.toString()  + ", especialidad=" + especialidad + ", Consulta=" + c ;
+        return super.toString()  + ", especialidad = " + especialidad + ", Centro = " + centro ;
     }
 
 

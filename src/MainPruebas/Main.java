@@ -1,5 +1,6 @@
 package MainPruebas;
 
+import Agendas.AgendaCitas;
 import Agendas.AgendaConsultas;
 import Agendas.Pacientes;
 import Agendas.Plantilla;
@@ -15,36 +16,52 @@ import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Scanner;
 
 public class Main {
 
-    public static void main(String[] args) throws AccessException, InvalidAttributeValueException {
+    private static void imprimirSeparador() {
+        System.out.println("--------------------------------------------------------\n");
+    }
 
-        System.out.println(">>> INICIANDO SISTEMA DE PRUEBAS <<<");
+    private static void SOP(Object o) {
+        System.out.println(o);
+    }
+
+    private static void SEP(Object o) {
+        System.err.println(o);
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        SOP(">>> PROGRAMA DE PRUEBA <<<");
 
         // Inicialización obligatoria del sistema
         Plantilla plantilla = new Plantilla();
         Pacientes listaPacientes = new Pacientes();
         AgendaConsultas agendaConsultas = new AgendaConsultas();
+        AgendaCitas citas = new AgendaCitas();
 
-        //Usuarios de autentificacion
+        //Usuarios para probar la "autentificacion"
         Admin su = new Admin("00000000T", 0);
         Paciente p = new Paciente("Paciente prueba", null, 0, "1111111B", 1);
         Medico m = new Medico("2222222C", 2, Especialidades.GENERAL, Centros.HOSPITAL_UNIVERSITARIO_12_DE_OCTUBRE);
         AdminCentroSalud ac = new AdminCentroSalud("3333333D", 3, Centros.HOSPITAL_UNIVERSITARIO_DE_GETAFE);
 
-        //"Autentificar" como Admin
+        //"Autentificar": -> Comentar y descomentar codigo
         Admin u = su;
         //Paciente u = p;
         //Medico u = m;
-        //AdminCentroSalud u = ac
+        //AdminCentroSalud u = ac;
 
-        System.out.println("\n[1] Preparando datos iniciales...");
+        SOP("\n[1] Preparando datos iniciales...");
 
         Medico m1 = new Medico("11112222A", 101, Especialidades.CARDIOLOGIA, Centros.HOSPITAL_UNIVERSITARIO_DE_FUENLABRADA);
         Medico m2 = new Medico("33334444Z", 102, Especialidades.PEDIATRIA, Centros.HOSPITAL_UNIVERSITARIO_PRINCIPE_DE_ASTURIAS);
+        //Medico m3 = new Medico("77778888Z", 103, Especialidades.CARDIOLOGIA, Centros.HOSPITAL_UNIVERSITARIO_HENARES);
         plantilla.agregarMedico(u, m1);
         plantilla.agregarMedico(u, m2);
+        //plantilla.agregarMedico(u, m3);
 
 
         Paciente pa1 = new Paciente("Laura Sánchez", "Calle Río 21", 612334455, "98765432L", 5001);
@@ -55,95 +72,79 @@ public class Main {
         AdminCentroSalud administrador = new AdminCentroSalud("44556677M", 4001, Centros.HOSPITAL_UNIVERSITARIO_TORREJON);
         plantilla.agregarAdministradorCentro(u, administrador);
 
-        System.out.println("Usuarios registrados correctamente.\n");
+        SOP("Usuarios registrados correctamente.\n");
 
-        // ===== pruebas administrador =====
-        System.out.println("[2] Comprobando funciones del administrador...");
+        imprimirSeparador();
+        SOP("[2] Prueba asignacion citas\n");
+        SOP(">>  Intentar asignar más de 20 citas\n");
+        for (int i = 0; i < 21; i++) {
+            Cita c = pa1.asignarCitaAutomatica(u, LocalDate.now(), Especialidades.CARDIOLOGIA, plantilla);
+            if (c == null) {
+                SEP("No se pudo asignar la cita " + i);
+            } else {
+                citas.agregarCita(u, c, 20);
+            }
+        }
 
-        System.out.println("Paciente original: " + pa1);
+        //Imprimir Citas
+        SOP(citas);
+
+        //Crear consultas y su historial.
+        imprimirSeparador();
+        SOP("[3]: Creacion consultas\n");
+        // "Avanzar" dos días.
+        SOP("\"Pasan\" 2 dias: " + LocalDate.now() + " -> " + LocalDate.now().plusDays(2));
+        LocalDate hoy =  LocalDate.now().plusDays(2);
 
 
-        Consulta c = new Consulta(LocalDate.now(), "colonoscopia", TipoConsulta.PRESENCIAL, TipoInforme.ALTA, Centros.HOSPITAL_UNIVERSITARIO_DE_MOSTOLES, m1);
-        c.recetarMedicamento(u, null);
-        agendaConsultas.agregarConsulta(u, c);
-        pa1.agregarAlHistorial(u, c);
+        // El propio medico debe rellenar informacion extra para completar el objeto consulta.
+        Cita c1 = citas.getCitas(u).get(0);
+        Cita c2 = citas.getCitas(u).get(1);
+        Cita c3 = citas.getCitas(u).get(2);
+        Scanner sc = new Scanner(System.in);
+        Medicamento ibuprofenoLaura = new Medicamento("Ibuprofeno",
+                10, 2,
+                TipoPreescripcion.PUNTUAL
+                , null, null);
 
+        //Completar con parametros
+        pa1.agregarAlHistorial(u,
+                Consulta.completarConsulta(
+                        u, c1, "Revision hipertension", TipoInforme.SEGUIMIENTO,
+                        TipoConsulta.PRESENCIAL,
+                        Centros.HOSPITAL_UNIVERSITARIO_12_DE_OCTUBRE));
 
+        //Añadir al segundo aunque se haya creado para el primero
+        //para probrar algo mas tarde.
+        pa2.agregarAlHistorial(u,
+                Consulta.completarConsulta(
+                        u, c1, "Ataque", TipoInforme.ALTA,
+                        TipoConsulta.PRESENCIAL,
+                        Centros.HOSPITAL_UNIVERSITARIO_12_DE_OCTUBRE));
 
-        administrador.setNombre(pa1, "Laura Beatriz Sánchez");
-        administrador.setDireccion(pa1, "Camino Alto 77");
-        administrador.setDNI(pa1, "00998877Q");
-        administrador.setCIPA(pa1, 5999);
+        //Completar con dialogo.
+        pa1.agregarAlHistorial(u,
+                Consulta.completarConsultaDialogo(u, c2, sc));
 
-        System.out.println("Paciente tras modificaciones administrativas: " + pa1 + "\n");
+        //Recetar un medicamenteo
+        pa1.getHistorial().getConsultas().get(1).recetarMedicamento(u, ibuprofenoLaura);
 
-        // ===== pruebas médico =====
-        System.out.println("[3] Verificación de agenda del médico...");
+        //Imprimir consultas
+        agendaConsultas.sincronizar(u, listaPacientes);
+        SOP("==== AGENDA GENERAL ====");
+        SOP(agendaConsultas);
 
-        LocalDateTime d1 = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(8, 30));
-        LocalDateTime d2 = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.of(9, 15));
+        //Borrar Citas
+        citas.eliminarCitasPasadas(u, hoy);
+        SOP("Citas restantes: ");
+        SOP(citas);
 
-        Cita ct1 = new Cita(d1, pa1, m1);
-        Cita ct2 = new Cita(d2, pa2, m1);
+        imprimirSeparador();
+        SOP("[4]: Consultas de cada paciente\n");
+        SOP("Consultas de " + pa1.getNombreCompleto() + "\n");
+        SOP(pa1.getHistorial().consultasToString());
+        SOP("Consultas de " + pa2.getNombreCompleto() + "\n");
+        SOP(pa2.getHistorial().consultasToString());
 
-        System.out.println("Citas programadas para el médico seleccionado:");
-        m1.visualizarCitas();
-
-        LocalDate diaReagenda = LocalDate.now().plusDays(3);
-        Cita ct3 = new Cita(LocalDateTime.of(diaReagenda, LocalTime.of(10, 45)), pa1, m1);
-
-        System.out.println("Intentando reagendar citas al día: " + diaReagenda);
-        System.out.println("Resultado del proceso: " + m1.reagendarCitas(diaReagenda) + "\n");
-
-        // ===== pruebas paciente =====
-        System.out.println("[4] Probando acciones del paciente...");
-
-        System.out.println("Solicitud de cita por parte del paciente: " + pa1.solicitarCitaMedico(ct2));
-
-        Cita alternativa = new Cita(LocalDateTime.now().plusDays(4), pa1, m2);
-        System.out.println("Intento de modificar la cita actual: " + pa1.modificarCita(ct1, alternativa));
-
-        System.out.println("\nAccediendo a información personal...");
-        System.out.println("Nombre: " + pa1.getNombre());
-        System.out.println("Dirección: " + pa1.getDireccion());
-        System.out.println("Teléfono actual: " + pa1.getTelefono());
-
-        pa1.setTelefono(611220033);
-        System.out.println("Nuevo número telefónico asignado: " + pa1.getTelefono() + "\n");
-
-        // ===== pruebas cita =====
-        System.out.println("[5] Validando que las citas funcionan correctamente...");
-
-        System.out.println("¿La cita ct1 está anulada? " + ct1.isAnulada());
-        ct1.cancelar("Imposibilidad de asistencia");
-        System.out.println("¿Y ahora? " + ct1.isAnulada());
-        System.out.println("Motivo registrado: " + ct1.getCausaAnulacion());
-
-        LocalDateTime nuevaFecha = LocalDateTime.now().plusDays(5);
-        ct2.reagendar(nuevaFecha);
-        System.out.println("ct2 actualizada a: " + ct2.imprimirFechaHora());
-
-        System.out.println("Notificación de reagendación: " + ct2.notificarReagendar(d2));
-
-        String aviso = ct2.notificar2Dias();
-        System.out.println("Recordatorio (2 días antes): " + (aviso != null ? aviso : "No corresponde enviar recordatorio"));
-
-        System.out.println("¿ct1 y ct2 son iguales? " + ct1.equals(ct2));
-        System.out.println("ct1 → " + ct1);
-        System.out.println("ct2 → " + ct2 + "\n");
-
-        // ===== pruebas usuario =====
-        System.out.println("[6] Acciones generales del usuario...");
-
-        LocalDateTime otraFecha = LocalDateTime.now().plusDays(7);
-        System.out.println("Modificando fecha de ct2: " + pa1.reagendarCita(ct2, otraFecha));
-
-        System.out.println("Cancelación de cita ct2 por el paciente: " + pa1.cancelarCita(ct2, "Cambio personal"));
-
-        System.out.println("\nComparaciones:");
-        System.out.println("m1 = m2 ? → " + m1.equals(m2));
-        System.out.println("pa1 = pa2 ? → " + pa1.equals(pa2));
-
-        System.out.println("\n>>> PRUEBAS FINALIZADAS <<<");
-
+    }
 }

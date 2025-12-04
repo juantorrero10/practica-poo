@@ -1,4 +1,6 @@
 package GestionHistorial;
+import Agendas.AgendaCitas;
+import Agendas.AgendaConsultas;
 import Medicacion.Medicamento;
 import Pruebas.Imagen;
 import Pruebas.Laboratorio;
@@ -35,6 +37,9 @@ public class Historial {
         return ret;
     }
 
+    public String consultasToString() {
+        return AgendaConsultas.arrayConsultasToString(consultas);
+    }
 
     // Añadir elementos a los ArrayLists
     public void agregarImagen(Imagen pi) {

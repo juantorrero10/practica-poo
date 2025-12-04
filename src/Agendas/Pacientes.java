@@ -6,14 +6,15 @@ import Usuarios.Usuario;
 
 import java.rmi.AccessException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Pacientes {
     private static ArrayList<Paciente> pacientes;
 
     public Pacientes() {
-        //todo: cagar archivo
-        new ArrayList<Paciente>();
+        //todo: cargar archivo
+        pacientes = new ArrayList<Paciente>();
     }
 
     public Paciente identificarPaciente(long CIPA) {
@@ -25,8 +26,13 @@ public class Pacientes {
 
     public boolean agregarPaciente(Usuario u, Paciente p) throws AccessException {
         Reestricion.adminCentro(u, "Pacientes.agregarPaciente");
-        if (this.pacientes.contains(p)) {this.pacientes.add(p); return true;}
+        if (!pacientes.contains(p)) {pacientes.add(p); return true;}
         return false;
+    }
+
+    public List<Paciente> getPacientes(Usuario u) throws AccessException {
+        Reestricion.noPaciente(u, "Pacientes.getPacientes");
+        return pacientes;
     }
 
 

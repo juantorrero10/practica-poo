@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class Medicamento {
+public class Medicamento {
 
     private String nombre;
     private int dosis;
@@ -61,6 +61,19 @@ public abstract class Medicamento {
         if (o == null || getClass() != o.getClass()) return false;
         Medicamento that = (Medicamento) o;
         return Objects.equals(nombre, that.nombre);
+    }
+
+    @Override
+    public String toString() {
+        String s = "medicamento: " + nombre;
+        s += "\ndosis: " + dosis + " mg" +
+                "\nfrecuencia: " + frecuencia + "veces/dia";
+        s += "\ntipo de preescripcion: " + tipoPreescripcion;
+        if (tipoPreescripcion == TipoPreescripcion.CRONICO) {
+            s += "\nfecha inicio: " + fechaInicio;
+            s += "\nfecha fin: " + fechaFin;
+        }
+        return s;
     }
 
     // Getters

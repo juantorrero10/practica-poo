@@ -21,7 +21,6 @@ public class Cita {
         this.medico = medico;
         this.fechaHora = fechaHora;
         this.anulada = false;
-        medico.anadirCita(this);
     }
 
 
@@ -94,7 +93,9 @@ public class Cita {
     @Override
     public String toString() {
         DateTimeFormatter f =DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm ");
-
-        return " Cita:" + fechaHora.format(f) + "\nPaciente: " + paciente.toString() + "\nMedico: " + medico.toString() ;
+        String s = "Cita:" + fechaHora.format(f) + "\nPaciente: \n" + paciente.toString() + "\nMedico: \n" + medico.toString();
+        s += "\nEstado = "; s += (anulada)? "Anulada\n" : "Vigente\n";
+        if (anulada) s += "Causa Anulacion: " +  causaAnulacion + "Fecha anulacion: \n" + fechaCancelacion.format(f);
+        return s;
     }
 }
