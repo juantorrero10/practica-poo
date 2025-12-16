@@ -2,11 +2,8 @@ package backend.Agendas;
 
 import backend.GestionHistorial.Consulta;
 import backend.Medicacion.Medicamento;
-import backend.Reestricion.Reestricion;
 import backend.Usuarios.Paciente;
-import backend.Usuarios.Usuario;
 
-import java.rmi.AccessException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,25 +14,22 @@ public class AgendaConsultas {
         consultas = new ArrayList<>();
     }
 
-    public void agregarConsulta(Usuario u, Consulta consulta) throws AccessException {
-        Reestricion.noPaciente(u, "AgendaConsultas.agregarConsulta");
+    public void agregarConsulta(Consulta consulta){
         if (!consultas.contains(consulta))consultas.add(consulta);
     }
 
-    public void recetar(Usuario u, Consulta consulta, Medicamento m) throws AccessException {
-        Reestricion.medico(u, "AgendaConsultas.preescribir");
+    public void recetar(Consulta consulta, Medicamento m){
         for (Consulta c : consultas) {
             if (c.equals(consulta)) {
-                c.recetarMedicamento(u, m);
+                c.recetarMedicamento(m);
             }
         }
     }
 
 
-    public void sincronizar(Usuario u, Pacientes lista) throws AccessException {
-        Reestricion.adminCentro(u, "AgendaConsultas.sincronizar");
+    public void sincronizar(Pacientes lista){
         consultas.clear();
-        for (Paciente p : lista.getPacientes(u)) {
+        for (Paciente p : lista.getPacientes()) {
             consultas.addAll(p.getHistorial().getConsultas());
         }
     }

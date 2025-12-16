@@ -2,7 +2,6 @@ package backend.Agendas;
 
 import backend.Citas.Cita;
 import backend.Enumeradores.Centros;
-import backend.Reestricion.Reestricion;
 import backend.Usuarios.Medico;
 import backend.Usuarios.Paciente;
 import backend.Usuarios.Usuario;
@@ -67,9 +66,8 @@ public class AgendaCitas {
      * Agregar una cita solo si el medico tiene menos del maximo permitidas en un día.
      * Los pacientes no pueden realizar esta operacion.
      */
-    public boolean agregarCita(Usuario u, Cita cita, int MAX_CITAS_MEDICOS) throws AccessException {
+    public boolean agregarCita(Cita cita, int MAX_CITAS_MEDICOS) {
         if (cita == null || citas.contains(cita)) return false;
-        Reestricion.noPaciente(u, "AgendaCitas.agregarCitas");
         List<Cita> lista = obtenerCitasMedico(cita.getMedico());
         List<Cita> lista2 = obtenerCitasDia(cita.getFechaHora().toLocalDate(), lista);
         if (lista2.size() > MAX_CITAS_MEDICOS) { return false; }
@@ -85,8 +83,7 @@ public class AgendaCitas {
         return r;
     }
 
-    public void eliminarCitasPasadas(Usuario u, LocalDate fecha) throws AccessException {
-        Reestricion.noPaciente(u, "AgendaCitas.eliminarCitasPasadas");
+    public void eliminarCitasPasadas(LocalDate fecha) {
         citas.removeIf(c -> c.getFechaHora().toLocalDate().isBefore(fecha));
     }
 
@@ -94,10 +91,8 @@ public class AgendaCitas {
      * Reagendar todas las citas de un día al otro.
      * Los pacientes no pueden realizar esta acción.
      */
-    public void reagendarCitasDia(Usuario usuario, LocalDate fecha, LocalDateTime nueva)
-            throws AccessException
+    public void reagendarCitasDia(LocalDate fecha, LocalDateTime nueva)
     {
-        Reestricion.noPaciente(usuario, "AgendaCitas.reagendarCitasDia");
 
         for (Cita c : citas) {
             if (c.getFechaHora().toLocalDate().equals(fecha)) {
@@ -109,8 +104,7 @@ public class AgendaCitas {
      * Actualizar todas las listas.
      * Solo los administradores generales pueden realizar esta accion.
      */
-    public void actualizarCitas(Usuario u, Plantilla p) throws AccessException {
-        Reestricion.adminSuper(u, "agendaCitas.actualizarCitas");
+    public void actualizarCitas(Plantilla p) throws AccessException {
         ArrayList<Cita> lista = new ArrayList<>();
         for (Medico m : p.getMedicos()) {
             lista.addAll(m.getAgenda());
@@ -123,8 +117,7 @@ public class AgendaCitas {
      * Actualizar todas las listas.
      * Solo los administradores generales pueden realizar esta accion.
      */
-    public void actualizarCitasCentro(Usuario u, Plantilla p, Centros c) throws AccessException {
-        Reestricion.adminCentro(u, "agendaCitas.actualizarCitasCentro");
+    public void actualizarCitasCentro(Plantilla p, Centros c){
         for (Medico m : p.getMedicosCentro(c)) {
             for (Cita cita : m.getAgenda()) {
                 if (!citas.contains(cita)) {
@@ -134,55 +127,9 @@ public class AgendaCitas {
         }
     }
 
-    public List<Cita> getCitas(Usuario u) throws AccessException {
-        Reestricion.adminCentro(u, "AgendaCitas.getCitas");
+    public List<Cita> getCitas(Usuario u){
         return citas;
     }
-
-    // Citas automaticas
-    // yo creo que mejor hacer un Paciente.asignarCitaAutomatica y luego
-    // en el main agendaCitas.anadirCita(cita); eso es lo que estaba pensando. Estoy haciendo esa funcion
-    // voy a hacer un main ahora para que entiendas mi vision Okay yo hago esta funcion y correcion de errores.
-    // Te voy a comentar el codigo un momento pa ver si compila
-    //okay
-    /*
-    public Cita agregarCitaAutomatica(Especialidades especialidad, Paciente paciente, Plantilla plantilla){ // Pasamos la plantilla completa
-        ArrayList<Medico> disponibles = new ArrayList<>();
-
-        for(Medico m: plantilla.getMedicos()){
-            if(m.getEspecialidad().equals(especialidad))disponibles.add(m);
-        }
-        if(disponibles.isEmpty()) return null;
-
-        LocalDate dia = LocalDate.now().plusDays(1);
-        LocalTime hora = LocalTime.of(8, 0);
-
-        while(true){
-            for(Medico m: disponibles){
-                LocalDateTime fechaHora = LocalDateTime.of(dia, hora);
-                Cita posible = new Cita(fechaHora,paciente,m);
-
-                if(comprobarDisponibilidad(posible) && !m.getAgenda().contains(posible)){
-                    citas.add(posible);
-                    m.anadirCita(paciente,posible);
-                    paciente.getArrayCitas().add(posible);
-                    return  posible;
-                }
-
-            }
-
-            //Aumentamos la hora
-            hora = hora.plusHours(1);
-            if(hora.isAfter(LocalTime.of(13,0))){
-                dia = dia.plusDays(1);
-                hora = hora.plusHours(1);
-
-            }
-
-        }
-
-
-    }*/
 
     public boolean comprobarDisponibilidad(Cita c){
         for(Cita cita: citas){

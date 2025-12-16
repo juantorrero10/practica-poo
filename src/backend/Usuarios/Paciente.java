@@ -5,9 +5,7 @@ import backend.Citas.Cita;
 import backend.Enumeradores.Especialidades;
 import backend.GestionHistorial.Consulta;
 import backend.GestionHistorial.Historial;
-import backend.Reestricion.Reestricion;
 
-import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,8 +32,7 @@ public class Paciente extends Usuario{
 
     }
 
-    public Cita asignarCitaAutomatica(Usuario u, LocalDate inicio, Especialidades esp, Plantilla p) throws AccessException {
-        Reestricion.noPaciente(u, "Paciente.asignarCitaAutomática");
+    public Cita asignarCitaAutomatica(LocalDate inicio, Especialidades esp, Plantilla p){
 
         Medico m = p.encontrarEspecilistaAleatorio(esp);
         if (m == null) {
@@ -58,7 +55,7 @@ public class Paciente extends Usuario{
             return null;
         }
 
-        if (!m.anadirCita(u, c)) {
+        if (!m.anadirCita(c)) {
             System.err.println("No se pudo asignar la cita.");
             return null;
         }
@@ -86,8 +83,7 @@ public class Paciente extends Usuario{
         return true;
     }
 
-    public void agregarAlHistorial(Usuario u, Consulta c) throws AccessException {
-        Reestricion.noPaciente(u, "Paciente.agregarAlHistorial");
+    public void agregarAlHistorial(Consulta c) {
         if (!historial.getConsultas().contains(c))historial.agregarConsulta(c);
     }
 
@@ -125,13 +121,11 @@ public class Paciente extends Usuario{
 
     // Setters que solo pueden ejecutar administradores de centro o administardores generales
 
-    public void setDireccion(Usuario u,String direccion) throws AccessException{
-        Reestricion.adminCentro(u, "Paciente.setDireccion");
+    public void setDireccion(String direccion){
         this.direccion = direccion;
     }
 
-    public void setNombreCompleto(Usuario u,String nombreCompleto) throws AccessException{
-        Reestricion.adminCentro(u,"Paciente.setNombreCompleto");
+    public void setNombreCompleto(String nombreCompleto) {
         this.nombreCompleto = nombreCompleto;
     }
 
@@ -150,7 +144,7 @@ public class Paciente extends Usuario{
 
     @Override
     public String toString() {
-        return  "NombreCompleto = " + nombreCompleto + ", direccion = " + direccion + ", telefono = " + telefono  ;
+        return  super.toString() + ", Nombre Completo = " + nombreCompleto + ", direccion = " + direccion + ", telefono = " + telefono  ;
     }
 
 

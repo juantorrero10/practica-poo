@@ -1,4 +1,11 @@
-package interfaz;
+package interfaz.Panel;
 
-public class PanelPaciente {
+import javax.swing.*;
+import java.awt.*;
+
+public class PanelPaciente extends Panel{
+
+    public PanelPaciente() {
+        super("Paciente");
+    }
 }

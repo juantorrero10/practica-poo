@@ -1,4 +1,11 @@
-package interfaz;
+package interfaz.Panel;
 
-public class PanelCentro {
+import javax.swing.*;
+import java.awt.*;
+
+public class PanelCentro extends Panel {
+
+    public PanelCentro() {
+        super("Gestión Centro");
+    }
 }

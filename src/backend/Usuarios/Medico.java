@@ -1,12 +1,10 @@
 package backend.Usuarios;
 
 import backend.Citas.Cita;
-import Enumeradores.*;
+import backend.Enumeradores.*;
 import backend.Enumeradores.Centros;
 import backend.Enumeradores.Especialidades;
-import backend.Reestricion.Reestricion;
 
-import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -44,8 +42,7 @@ public class Medico extends Usuario{
     }
 
 
-    public boolean anadirCita(Usuario u, Cita c) throws AccessException {
-        Reestricion.noPaciente(u, "Medico.anadirCita");
+    public boolean anadirCita(Cita c) {
         if (c == null) return false;
         if (getCitasParaDia(c.getFechaHora().toLocalDate()) >= MAXCITASDIARIAS ||
             agendaCitas.contains(c)) {

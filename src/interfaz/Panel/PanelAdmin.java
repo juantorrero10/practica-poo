@@ -1,4 +1,11 @@
-package interfaz;
+package interfaz.Panel;
 
-public class PanelAdmin {
+import javax.swing.*;
+import java.awt.*;
+
+public class PanelAdmin extends Panel {
+
+    public PanelAdmin() {
+        super("Administrador");
+    }
 }

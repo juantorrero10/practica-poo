@@ -1,18 +1,15 @@
 package backend.GestionHistorial;
 
 import backend.Citas.Cita;
-import Enumeradores.*;
+import backend.Enumeradores.*;
 import backend.Enumeradores.Centros;
 import backend.Enumeradores.Especialidades;
 import backend.Enumeradores.TipoConsulta;
 import backend.Enumeradores.TipoInforme;
 import backend.Medicacion.Medicamento;
-import backend.Reestricion.Reestricion;
 import backend.Usuarios.Medico;
-import backend.Usuarios.Usuario;
 
 import javax.management.InvalidAttributeValueException;
-import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.util.Scanner;
 
@@ -52,8 +49,7 @@ public class Consulta {
         }
     }
 
-    public void recetarMedicamento(Usuario u, Medicamento med) throws AccessException {
-        Reestricion.medico(u, "Consulta.recetarMedicamento");
+    public void recetarMedicamento(Medicamento med) {
         this.preescripcion = med;
     }
 
@@ -122,10 +118,9 @@ public class Consulta {
     /**
      * @param cita debe contener la fecha y hora a la que sucedio y el medico que atendió
      */
-    public static Consulta completarConsulta(Usuario u, Cita cita, String motivo, TipoInforme ti, TipoConsulta tc, Centros cen)
-            throws AccessException, InvalidAttributeValueException
+    public static Consulta completarConsulta(Cita cita, String motivo, TipoInforme ti, TipoConsulta tc, Centros cen)
+            throws InvalidAttributeValueException
     {
-        Reestricion.noPaciente(u, "Consulta.completarConsulta");
         return new Consulta(cita.getFechaHora().toLocalDate(),
                 motivo,
                 tc,
@@ -138,12 +133,11 @@ public class Consulta {
      * @param cita debe contener la fecha y hora a la que sucedio y el medico que atendió
      * Completar consulta por dialogo.
      */
-    public static Consulta completarConsultaDialogo(Usuario u, Cita cita, Scanner sc)
+    public static Consulta completarConsultaDialogo(Cita cita, Scanner sc)
             throws Exception {
         if (cita.getFechaHora() == null || cita.getMedico() == null) {
             return null;
         }
-        Reestricion.noPaciente(u, "Consulta.completarConsulta");
         String respuesta;
         String motivo;
         TipoInforme ti;
@@ -178,7 +172,7 @@ public class Consulta {
         cen = Centros.values()[Integer.parseInt(respuesta)];
         lanzarValorInvalidoEnum(cen.ordinal(), Centros.HOSPITAL_UNIVERSITARIO_TORREJON.ordinal());
 
-        return completarConsulta(u, cita, motivo, ti, tc, cen);
+        return completarConsulta(cita, motivo, ti, tc, cen);
     }
 
 

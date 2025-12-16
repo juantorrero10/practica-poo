@@ -1,4 +1,8 @@
-package interfaz;
+package interfaz.Panel;
 
-public class PanelMedico {
+public class PanelMedico extends Panel{
+
+    public PanelMedico() {
+        super("Médico");
+    }
 }

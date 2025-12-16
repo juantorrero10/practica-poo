@@ -2,13 +2,10 @@ package backend.Agendas;
 
 import backend.Enumeradores.Centros;
 import backend.Enumeradores.Especialidades;
-import backend.Reestricion.Reestricion;
 import backend.Usuarios.Admin;
 import backend.Usuarios.AdminCentroSalud;
 import backend.Usuarios.Medico;
-import backend.Usuarios.Usuario;
 
-import java.rmi.AccessException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -44,6 +41,14 @@ public class Plantilla {
         return medicos;
     }
 
+    public List<AdminCentroSalud> getAdministradoresCentroSalud() {
+        return administradoresCentroSalud;
+    }
+
+    public List<Admin> getAdministradores() {
+        return administradores;
+    }
+
     public List<Medico> getMedicos() {
         return medicos;
     }
@@ -56,18 +61,37 @@ public class Plantilla {
         return listaEsp.get(idx);
     }
 
-    public void agregarAdministrador(Usuario u, Admin nuevo) throws AccessException {
-        Reestricion.adminSuper(u, "Plantilla.agregarAdministrador");
+    public void agregarAdministrador(Admin nuevo)  {
         if(!administradores.contains(nuevo)) administradores.add(nuevo);
     }
-    public void agregarMedico(Usuario u, Medico nuevo) throws AccessException {
-        Reestricion.adminCentro(u, "Plantilla.agregarMedico");
+    public void agregarMedico(Medico nuevo) {
         if(!medicos.contains(nuevo)) medicos.add(nuevo);
     }
-    public void agregarAdministradorCentro(Usuario u, AdminCentroSalud nuevo) throws AccessException {
-        Reestricion.adminSuper(u, "Plantilla.agregarAdministradorCentro");
-        if(administradoresCentroSalud.contains(nuevo)) administradoresCentroSalud.add(nuevo);
+    public void agregarAdministradorCentro(AdminCentroSalud nuevo) {
+        if(!administradoresCentroSalud.contains(nuevo)) {
+            administradoresCentroSalud.add(nuevo);
+        }
     }
 
+    @Override
+    public String toString() {
+        String s= "----ADMINISTRADORES----\n";
+        for (Admin a : administradores) {
+            s += a.toString();
+            s += "\n";
+        }
 
+        s += "-----GESTION CENTRO-----\n";
+        for (AdminCentroSalud ac : administradoresCentroSalud) {
+            s += ac.toString();
+            s += "\n";
+        }
+
+        s += "----MEDICOS----\n";
+        for (Medico m : medicos) {
+            s +=  m.toString();
+            s += "\n";
+        }
+        return s;
+    }
 }

@@ -1,10 +1,8 @@
 package backend.Agendas;
 
-import backend.Reestricion.Reestricion;
 import backend.Usuarios.Paciente;
 import backend.Usuarios.Usuario;
 
-import java.rmi.AccessException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,16 +21,21 @@ public class Pacientes {
         return null;
     }
 
-    public boolean agregarPaciente(Usuario u, Paciente p) throws AccessException {
-        Reestricion.adminCentro(u, "Pacientes.agregarPaciente");
+    public boolean agregarPaciente(Paciente p)  {
         if (!pacientes.contains(p)) {pacientes.add(p); return true;}
         return false;
     }
 
-    public List<Paciente> getPacientes(Usuario u) throws AccessException {
-        Reestricion.noPaciente(u, "Pacientes.getPacientes");
+    public List<Paciente> getPacientes(){
         return pacientes;
     }
-
-
+    @Override
+    public String toString() {
+        String s = "";
+        for (Paciente paciente : pacientes) {
+            s += paciente.toString();
+            s += "\n";
+        }
+        return s;
+    }
 }
