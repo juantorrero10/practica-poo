@@ -1,6 +1,7 @@
 package backend.Usuarios;
 
 
+import Controlador.TipoUsuario;
 import backend.Citas.Cita;
 
 import java.time.LocalDateTime;
@@ -68,5 +69,9 @@ public abstract class Usuario {
         Usuario u = (Usuario) o;
 
         return (this.cipa == u.cipa);
+    }
+
+    public TipoUsuario getTipoUsuario(){
+        return TipoUsuario.getTipoUsuario(this);
     }
 }

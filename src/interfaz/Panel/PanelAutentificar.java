@@ -10,15 +10,16 @@ import java.awt.*;
 
 public class PanelAutentificar extends Panel {
 
-    private final Controlador controlador;
-
+    //Elementos
     private JComboBox<TipoUsuario> selectorRol;
+    private JLabel labelHeader;
     private JTextField campoCIPA;
     private JLabel labelError;
     private JButton botonAutentificar;
+    private JPanel panelMarco;
 
     public PanelAutentificar(Controlador c) {
-        super("Autentificar");
+        super("Autentificar", c);
         controlador = c;
 
         inicializarComponentes();
@@ -38,46 +39,88 @@ public class PanelAutentificar extends Panel {
 
         botonAutentificar = new JButton("Autentificar");
 
+        panelMarco = new JPanel(new GridBagLayout());
         labelError = new JLabel(" "); // espacio reservado
         labelError.setForeground(Color.RED);
         labelError.setFont(labelError.getFont().deriveFont(Font.PLAIN, 11f));
-        labelError.setPreferredSize(new Dimension(250, 15));
+        labelError.setPreferredSize(new Dimension(300, 15));
+
+        labelHeader = new JLabel("Autentificación");
+        labelHeader.setForeground(Color.DARK_GRAY);
+        labelHeader.setFont(labelHeader.getFont().deriveFont(Font.BOLD, 30f));
+        labelHeader.setPreferredSize(new Dimension(300, 60));
+        labelHeader.setHorizontalAlignment(SwingConstants.CENTER);
+
     }
 
     private void layoutComponentes() {
         setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
 
-        gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.WEST;
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+
+        // -------- ESPACIO SUPERIOR --------
+        gbc.gridy = 0;
+        gbc.weighty = 1;
+        add(Box.createVerticalGlue(), gbc);
+
+        // -------- HEADER --------
+        gbc.gridy = 1;
+        gbc.weighty = 0;
+        add(labelHeader, gbc);
+
+        // -------- MARCO --------
+        panelMarco.setBorder(
+                BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Color.GRAY, 1),
+                        BorderFactory.createEmptyBorder(15, 20, 15, 20)
+                )
+        );
+
+        gbc.gridy = 2;
+        gbc.insets = new Insets(20, 0, 0, 0);
+        add(panelMarco, gbc);
+
+        // -------- ESPACIO INFERIOR --------
+        gbc.gridy = 3;
+        gbc.weighty = 1;
+        add(Box.createVerticalGlue(), gbc);
+
+        // ===== CONTENIDO DEL MARCO =====
+        GridBagConstraints gbcMarco = new GridBagConstraints();
+        gbcMarco.insets = new Insets(5, 5, 5, 5);
+        gbcMarco.anchor = GridBagConstraints.WEST;
 
         // Tipo usuario
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        add(new JLabel("Tipo de usuario:"), gbc);
+        gbcMarco.gridx = 0;
+        gbcMarco.gridy = 0;
+        panelMarco.add(new JLabel("Tipo de usuario:"), gbcMarco);
 
-        gbc.gridx = 1;
-        add(selectorRol, gbc);
+        gbcMarco.gridx = 1;
+        panelMarco.add(selectorRol, gbcMarco);
 
         // CIPA
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        add(new JLabel("CIPA:"), gbc);
+        gbcMarco.gridx = 0;
+        gbcMarco.gridy = 1;
+        panelMarco.add(new JLabel("CIPA:"), gbcMarco);
 
-        gbc.gridx = 1;
-        add(campoCIPA, gbc);
+        gbcMarco.gridx = 1;
+        panelMarco.add(campoCIPA, gbcMarco);
 
-        // Botón (centrado debajo)
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        add(botonAutentificar, gbc);
+        // Botón centrado
+        gbcMarco.gridx = 0;
+        gbcMarco.gridy = 2;
+        gbcMarco.gridwidth = 2;
+        gbcMarco.anchor = GridBagConstraints.CENTER;
+        panelMarco.add(botonAutentificar, gbcMarco);
 
-        // Error (centrado, espacio fijo)
-        gbc.gridy = 3;
-        add(labelError, gbc);
+        // Error
+        gbcMarco.gridy = 3;
+        panelMarco.add(labelError, gbcMarco);
     }
+
 
     private void registrarEventos() {
         botonAutentificar.addActionListener(e -> autentificar());

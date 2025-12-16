@@ -3,5 +3,5 @@ package Controlador;
 import backend.Usuarios.Usuario;
 
 public interface OyenteSesion {
-    void onSesionUpdate(Usuario usuario);
+    void onSesionUpdate(Usuario usuario, TipoUsuario tipoUsuario);
 }

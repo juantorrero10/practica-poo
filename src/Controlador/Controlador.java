@@ -46,9 +46,9 @@ public class Controlador {
         this(new Plantilla(), new Pacientes(), new AgendaConsultas(), new AgendaCitas());
     }
 
-    public void notificarCambioSesion(Usuario usuario) {
+    public void notificarCambioSesion(Usuario usuario, TipoUsuario tipoUsuario) {
         for (OyenteSesion oyente : oyentes) {
-            oyente.onSesionUpdate(usuario);
+            oyente.onSesionUpdate(usuario, tipoUsuario);
         }
     }
 
@@ -100,40 +100,48 @@ public class Controlador {
         return loginAdmin;
     }
 
-    public boolean cerrarSession(TipoUsuario tp) {
+    public boolean cerrarSesion(TipoUsuario tp) {
+        Log.INFO("Cierre de Sesion del tipo: "+tp.toString());
         switch (tp) {
             case ADMIN:
-                if (loginAdmin != null) { notificarCambioSesion(null); loginAdmin = null; return true; }
+                if (loginAdmin != null) { notificarCambioSesion(null, tp); loginAdmin = null; return true; }
                 break;
             case MEDICO:
-                if (loginMedico != null) { notificarCambioSesion(null); loginMedico = null; return true; }
+                if (loginMedico != null) { notificarCambioSesion(null, tp); loginMedico = null; return true; }
                 break;
             case ADMINCENTRO:
-                if (loginAdminC != null) { notificarCambioSesion(null); loginAdminC = null; return true; }
+                if (loginAdminC != null) { notificarCambioSesion(null, tp); loginAdminC = null; return true; }
                 break;
             case PACIENTE:
-                if (loginPaciente != null) { notificarCambioSesion(null); loginPaciente = null; return true; }
+                if (loginPaciente != null) { notificarCambioSesion(null, tp); loginPaciente = null; return true; }
                 break;
         }
         return false;
     }
 
     public boolean cambiarUsuario(Usuario usuario) {
+        TipoUsuario tp = usuario.getTipoUsuario();
+
         if (usuario == null) {
             Log.ERR("El Usuario es nulo.");
             return false;
         }
-        if (usuario instanceof Admin) {
-            if (loginAdmin == null)  { loginAdmin = (Admin) usuario; notificarCambioSesion(usuario); return true; }
-        }
-        else if (usuario instanceof Paciente) {
-            if (loginPaciente == null)  { loginPaciente = (Paciente) usuario; notificarCambioSesion(usuario); return true; }
-        }
-        else if (usuario instanceof Medico) {
-            if (loginMedico == null)  { loginMedico = (Medico) usuario; notificarCambioSesion(usuario); return true;}
-        }
-        else if (usuario instanceof AdminCentroSalud) {
-            if (loginAdminC == null)  { loginAdminC = (AdminCentroSalud) usuario; notificarCambioSesion(usuario); return true;}
+        switch (tp) {
+            case ADMIN:
+                if (loginAdmin == null)  { loginAdmin = (Admin) usuario; notificarCambioSesion(usuario, tp); return true; }
+                break;
+            case PACIENTE:
+                if (loginPaciente == null)  { loginPaciente = (Paciente) usuario; notificarCambioSesion(usuario, tp); return true; }
+                break;
+            case MEDICO:
+                if (loginMedico == null)  { loginMedico = (Medico) usuario; notificarCambioSesion(usuario, tp); return true;}
+                break;
+            case ADMINCENTRO:
+                if (loginAdminC == null)  { loginAdminC = (AdminCentroSalud) usuario; notificarCambioSesion(usuario, tp); return true;}
+                break;
+            default:
+                Log.WARN("el tipo de usuario no es válido: " + tp.ordinal());
+                return false;
         }
         return false;
     }
