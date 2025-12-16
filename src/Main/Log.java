@@ -20,13 +20,13 @@ public class Log {
     private static final String COLOR_GRAY = "\033[0;90m";
 
     //MENSAJES
-    private static final String infoMsg = COLOR_GRAY + "[" + COLOR_BLUE + "i" + COLOR_GRAY + "] " + COLOR_RESET;
-    private static final String warnMsg = COLOR_GRAY + "[" + COLOR_YELLOW + "*" + COLOR_GRAY + "] " + COLOR_RESET;
-    private static final String errMsg = COLOR_GRAY + "[" + COLOR_RED + "!" + COLOR_GRAY + "] " + COLOR_RESET;
+    private static final String infoMsg = COLOR_BLUE + "[i] " + COLOR_RESET;
+    private static final String warnMsg = COLOR_YELLOW + "[*] " + COLOR_RESET;
+    private static final String errMsg = COLOR_RED + "[!] " + COLOR_RESET;
 
     private static void logmsg(PrintStream p, String lbl, String msg) {
         LocalDateTime now = LocalDateTime.now();
-        p.println(lbl + COLOR_GRAY + "["+ f.format(now) + "]: " + COLOR_RESET + msg);
+        p.println(lbl + COLOR_GRAY + "["+ f.format(now) + "]: " + COLOR_RESET + msg + COLOR_RESET);
     }
 
     public static void INFO(String msg) {
@@ -38,6 +38,6 @@ public class Log {
     }
 
     public static void ERR(String msg) {
-        logmsg(System.err, errMsg, msg);
+        logmsg(System.err, errMsg, COLOR_RED + msg);
     }
 }

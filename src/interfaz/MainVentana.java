@@ -59,13 +59,21 @@ public class MainVentana extends JFrame implements OyenteSesion {
     public void onSesionUpdate(Usuario usuario) {
         switch(TipoUsuario.getTipoUsuario(usuario)) {
             case TipoUsuario.PACIENTE:
-                tabs.setEnabledAt(tabPaciente,true);    break;
+                tabs.setEnabledAt(tabPaciente,true);
+                tabs.setSelectedIndex(tabPaciente);
+                break;
             case TipoUsuario.ADMIN:
-                tabs.setEnabledAt(tabAdmin,true);       break;
+                tabs.setEnabledAt(tabAdmin,true);
+                tabs.setSelectedIndex(tabAdmin);
+                break;
             case TipoUsuario.ADMINCENTRO:
-                tabs.setEnabledAt(tabAdminCentro,true); break;
+                tabs.setEnabledAt(tabAdminCentro,true);
+                tabs.setSelectedIndex(tabAdminCentro);
+                break;
             case TipoUsuario.MEDICO:
-                tabs.setEnabledAt(tabMedico,true);      break;
+                tabs.setEnabledAt(tabMedico,true);
+                tabs.setSelectedIndex(tabMedico);
+                break;
 
         }
     }

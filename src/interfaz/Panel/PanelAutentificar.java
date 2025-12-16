@@ -97,6 +97,8 @@ public class PanelAutentificar extends Panel {
         TipoUsuario tipoSeleccionado =
                 (TipoUsuario) selectorRol.getSelectedItem();
 
+        if (tipoSeleccionado == null) tipoSeleccionado = TipoUsuario.NO_ESPECIFICADO;
+
         Log.INFO("Autentificación con CIPA=" + cipa + ", TipoUsuario=" + tipoSeleccionado);
 
         Usuario usuario = controlador.getUsuario(cipa, tipoSeleccionado);
@@ -109,7 +111,7 @@ public class PanelAutentificar extends Panel {
 
         if (!controlador.cambiarUsuario(usuario)) {
             mostrarError("Se debe cerrar la sesión del usuario con el mismo tipo.");
-            Log.ERR("Ya se ha autentificado con el tipo" + usuario.getClass().getSimpleName());
+            Log.ERR("Ya se ha autentificado con el tipo: " + usuario.getClass().getSimpleName());
             Log.WARN("Se debe cerrar la sesion de " + controlador.getLoginUsuario(tipoSeleccionado));
             return;
         }
