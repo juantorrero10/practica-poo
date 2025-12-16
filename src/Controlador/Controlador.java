@@ -1,4 +1,4 @@
-package interaciones;
+package Controlador;
 
 
 import Main.Log;
@@ -8,6 +8,7 @@ import backend.Agendas.Pacientes;
 import backend.Agendas.Plantilla;
 import backend.Usuarios.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Controlador {
@@ -17,29 +18,42 @@ public class Controlador {
     private AgendaConsultas agendaConsultas;
     private AgendaCitas citas;
 
+
+    // Hasta 4 sesiones abiertas, una por cada tipo.
     private Paciente loginPaciente;
     private Medico loginMedico;
     private AdminCentroSalud loginAdminC;
     private Admin loginAdmin;
 
-
-    public Controlador() {
-        Plantilla plantilla = new Plantilla();
-        Pacientes listaPacientes = new Pacientes();
-        AgendaConsultas agendaConsultas = new AgendaConsultas();
-        AgendaCitas citas = new AgendaCitas();
-
-        loginPaciente = null;
-        loginMedico = null;
-        loginAdmin = null;
-        loginAdminC = null;
-    }
+    // Oyentes
+    private List<OyenteSesion> oyentes;
 
     public Controlador(Plantilla p, Pacientes pa, AgendaConsultas a, AgendaCitas c) {
         this.plantilla = p;
         this.agendaConsultas = a;
         this.citas = c;
         this.listaPacientes = pa;
+
+        loginPaciente = null;
+        loginMedico = null;
+        loginAdmin = null;
+        loginAdminC = null;
+
+        oyentes = new ArrayList<>();
+    }
+
+    public Controlador() {
+        this(new Plantilla(), new Pacientes(), new AgendaConsultas(), new AgendaCitas());
+    }
+
+    public void notificarCambioSesion(Usuario usuario) {
+        for (OyenteSesion oyente : oyentes) {
+            oyente.onSesionUpdate(usuario);
+        }
+    }
+
+    public void addOyente(OyenteSesion l) {
+        oyentes.add(l);
     }
 
     public Controlador(String RutaFicheroCSV) {
@@ -86,22 +100,40 @@ public class Controlador {
         return loginAdmin;
     }
 
+    public boolean cerrarSession(TipoUsuario tp) {
+        switch (tp) {
+            case ADMIN:
+                if (loginAdmin != null) { notificarCambioSesion(null); loginAdmin = null; return true; }
+                break;
+            case MEDICO:
+                if (loginMedico != null) { notificarCambioSesion(null); loginMedico = null; return true; }
+                break;
+            case ADMINCENTRO:
+                if (loginAdminC != null) { notificarCambioSesion(null); loginAdminC = null; return true; }
+                break;
+            case PACIENTE:
+                if (loginPaciente != null) { notificarCambioSesion(null); loginPaciente = null; return true; }
+                break;
+        }
+        return false;
+    }
+
     public boolean cambiarUsuario(Usuario usuario) {
         if (usuario == null) {
             Log.ERR("El Usuario es nulo.");
             return false;
         }
         if (usuario instanceof Admin) {
-            if (loginAdmin == null)  { loginAdmin = (Admin) usuario; return true; }
+            if (loginAdmin == null)  { loginAdmin = (Admin) usuario; notificarCambioSesion(usuario); return true; }
         }
         else if (usuario instanceof Paciente) {
-            if (loginPaciente == null)  { loginPaciente = (Paciente) usuario; return true; }
+            if (loginPaciente == null)  { loginPaciente = (Paciente) usuario; notificarCambioSesion(usuario); return true; }
         }
         else if (usuario instanceof Medico) {
-            if (loginMedico == null)  { loginMedico = (Medico) usuario; return true;}
+            if (loginMedico == null)  { loginMedico = (Medico) usuario; notificarCambioSesion(usuario); return true;}
         }
         else if (usuario instanceof AdminCentroSalud) {
-            if (loginAdminC == null)  { loginAdminC = (AdminCentroSalud) usuario; return true;}
+            if (loginAdminC == null)  { loginAdminC = (AdminCentroSalud) usuario; notificarCambioSesion(usuario); return true;}
         }
         return false;
     }

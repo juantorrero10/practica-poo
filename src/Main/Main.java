@@ -11,7 +11,7 @@ import backend.Usuarios.Admin;
 import backend.Usuarios.AdminCentroSalud;
 import backend.Usuarios.Medico;
 import backend.Usuarios.Paciente;
-import interaciones.Controlador;
+import Controlador.Controlador;
 import interfaz.MainVentana;
 
 public class Main {

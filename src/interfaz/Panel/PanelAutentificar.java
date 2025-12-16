@@ -2,8 +2,8 @@ package interfaz.Panel;
 
 import Main.Log;
 import backend.Usuarios.Usuario;
-import interaciones.Controlador;
-import interaciones.TipoUsuario;
+import Controlador.Controlador;
+import Controlador.TipoUsuario;
 
 import javax.swing.*;
 import java.awt.*;
