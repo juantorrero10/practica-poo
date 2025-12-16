@@ -1,21 +1,16 @@
-package Agendas;
+package backend.Agendas;
 
-import Citas.Cita;
-import Enumeradores.Centros;
-import Enumeradores.Especialidades;
-import Enumeradores.TipoConsulta;
-import Enumeradores.TipoInforme;
-import GestionHistorial.Consulta;
-import Reestricion.Reestricion;
-import Usuarios.*;
+import backend.Citas.Cita;
+import backend.Enumeradores.Centros;
+import backend.Reestricion.Reestricion;
+import backend.Usuarios.Medico;
+import backend.Usuarios.Paciente;
+import backend.Usuarios.Usuario;
 
 
-import javax.management.InvalidAttributeValueException;
 import java.rmi.AccessException;
-import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +29,7 @@ public class AgendaCitas {
         if (lista == null) { lista = citas; }
         List<Cita> r = new ArrayList<>();
         for (Cita c : lista) {
-            if      (o instanceof Medico   && c.getMedico().equals(o)) { r.add(c); }
+            if      (o instanceof Medico && c.getMedico().equals(o)) { r.add(c); }
             else if (o instanceof Paciente && c.getPaciente().equals(o)) { r.add(c); }
         }
         return r;

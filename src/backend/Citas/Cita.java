@@ -1,8 +1,8 @@
-package Citas;
+package backend.Citas;
 
-import Usuarios.Paciente;
-import Usuarios.Medico;
-import java.time.LocalDate;
+import backend.Usuarios.Paciente;
+import backend.Usuarios.Medico;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 

@@ -1,7 +1,7 @@
-package Pruebas;
+package backend.Pruebas;
 
 
-import Enumeradores.Centros;
+import backend.Enumeradores.Centros;
 
 import java.time.LocalDateTime;
 

@@ -1,21 +1,19 @@
 package MainPruebas;
 
-import Agendas.AgendaCitas;
-import Agendas.AgendaConsultas;
-import Agendas.Pacientes;
-import Agendas.Plantilla;
-import GestionHistorial.Consulta;
-import Medicacion.Medicamento;
-import Reestricion.Reestricion;
-import Usuarios.*;
-import Enumeradores.*;
-import Citas.Cita;
+import backend.Agendas.AgendaCitas;
+import backend.Agendas.AgendaConsultas;
+import backend.Enumeradores.*;
+import backend.Agendas.Pacientes;
+import backend.Agendas.Plantilla;
+import backend.GestionHistorial.Consulta;
+import backend.Medicacion.Medicamento;
+import backend.Citas.Cita;
+import backend.Usuarios.Admin;
+import backend.Usuarios.AdminCentroSalud;
+import backend.Usuarios.Medico;
+import backend.Usuarios.Paciente;
 
-import javax.management.InvalidAttributeValueException;
-import java.rmi.AccessException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Scanner;
 
 public class Main {

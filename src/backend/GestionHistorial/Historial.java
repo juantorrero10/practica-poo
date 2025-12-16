@@ -1,10 +1,8 @@
-package GestionHistorial;
-import Agendas.AgendaCitas;
-import Agendas.AgendaConsultas;
-import Medicacion.Medicamento;
-import Pruebas.Imagen;
-import Pruebas.Laboratorio;
-import Pruebas.Prueba;
+package backend.GestionHistorial;
+import backend.Agendas.AgendaConsultas;
+import backend.Medicacion.Medicamento;
+import backend.Pruebas.Imagen;
+import backend.Pruebas.Laboratorio;
 
 import java.util.ArrayList;
 import java.util.List;

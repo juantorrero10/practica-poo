@@ -1,9 +1,10 @@
-package Usuarios;
+package backend.Usuarios;
 
-import Citas.Cita;
+import backend.Citas.Cita;
 import Enumeradores.*;
-import Medicacion.Medicamento;
-import Reestricion.Reestricion;
+import backend.Enumeradores.Centros;
+import backend.Enumeradores.Especialidades;
+import backend.Reestricion.Reestricion;
 
 import java.rmi.AccessException;
 import java.time.LocalDate;

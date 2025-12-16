@@ -1,12 +1,12 @@
-package Agendas;
+package backend.Agendas;
 
-import Enumeradores.Centros;
-import Enumeradores.Especialidades;
-import Reestricion.Reestricion;
-import Usuarios.Admin;
-import Usuarios.AdminCentroSalud;
-import Usuarios.Medico;
-import Usuarios.Usuario;
+import backend.Enumeradores.Centros;
+import backend.Enumeradores.Especialidades;
+import backend.Reestricion.Reestricion;
+import backend.Usuarios.Admin;
+import backend.Usuarios.AdminCentroSalud;
+import backend.Usuarios.Medico;
+import backend.Usuarios.Usuario;
 
 import java.rmi.AccessException;
 import java.util.ArrayList;

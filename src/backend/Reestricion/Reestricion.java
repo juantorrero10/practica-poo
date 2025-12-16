@@ -1,10 +1,9 @@
-package Reestricion;
+package backend.Reestricion;
 
-import Enumeradores.Centros;
-import Usuarios.Admin;
-import Usuarios.AdminCentroSalud;
-import Usuarios.Medico;
-import Usuarios.Usuario;
+import backend.Usuarios.Admin;
+import backend.Usuarios.AdminCentroSalud;
+import backend.Usuarios.Medico;
+import backend.Usuarios.Usuario;
 
 import java.rmi.AccessException;
 

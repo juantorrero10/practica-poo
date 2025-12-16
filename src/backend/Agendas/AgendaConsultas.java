@@ -1,11 +1,10 @@
-package Agendas;
+package backend.Agendas;
 
-import GestionHistorial.Consulta;
-import GestionHistorial.Historial;
-import Medicacion.Medicamento;
-import Reestricion.Reestricion;
-import Usuarios.Paciente;
-import Usuarios.Usuario;
+import backend.GestionHistorial.Consulta;
+import backend.Medicacion.Medicamento;
+import backend.Reestricion.Reestricion;
+import backend.Usuarios.Paciente;
+import backend.Usuarios.Usuario;
 
 import java.rmi.AccessException;
 import java.util.ArrayList;

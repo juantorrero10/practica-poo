@@ -1,4 +1,4 @@
-package Enumeradores;
+package backend.Enumeradores;
 
 public enum TipoConsulta {
     NO_ESPECIFICADO,

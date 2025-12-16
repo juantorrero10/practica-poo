@@ -1,11 +1,15 @@
-package GestionHistorial;
+package backend.GestionHistorial;
 
-import Citas.Cita;
+import backend.Citas.Cita;
 import Enumeradores.*;
-import Medicacion.Medicamento;
-import Reestricion.Reestricion;
-import Usuarios.Medico;
-import Usuarios.Usuario;
+import backend.Enumeradores.Centros;
+import backend.Enumeradores.Especialidades;
+import backend.Enumeradores.TipoConsulta;
+import backend.Enumeradores.TipoInforme;
+import backend.Medicacion.Medicamento;
+import backend.Reestricion.Reestricion;
+import backend.Usuarios.Medico;
+import backend.Usuarios.Usuario;
 
 import javax.management.InvalidAttributeValueException;
 import java.rmi.AccessException;

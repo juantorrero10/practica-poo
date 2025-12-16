@@ -1,19 +1,17 @@
-package Usuarios;
+package backend.Usuarios;
 
-import Agendas.Pacientes;
-import Agendas.Plantilla;
-import Citas.Cita;
-import Enumeradores.Especialidades;
-import GestionHistorial.Consulta;
-import GestionHistorial.Historial;
-import Reestricion.Reestricion;
+import backend.Agendas.Plantilla;
+import backend.Citas.Cita;
+import backend.Enumeradores.Especialidades;
+import backend.GestionHistorial.Consulta;
+import backend.GestionHistorial.Historial;
+import backend.Reestricion.Reestricion;
 
 import java.rmi.AccessException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 
 public class Paciente extends Usuario{

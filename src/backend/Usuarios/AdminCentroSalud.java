@@ -1,6 +1,6 @@
-package Usuarios;
+package backend.Usuarios;
 
-import Enumeradores.Centros;
+import backend.Enumeradores.Centros;
 
 public class AdminCentroSalud extends Usuario{
 

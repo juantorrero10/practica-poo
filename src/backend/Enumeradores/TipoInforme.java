@@ -1,4 +1,4 @@
-package Enumeradores;
+package backend.Enumeradores;
 
 public enum TipoInforme {
     NO_ESPECIFICADO,

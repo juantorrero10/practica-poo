@@ -1,10 +1,9 @@
-package Usuarios;
+package backend.Usuarios;
 
 
-import Citas.Cita;
-import java.time.LocalDate;
+import backend.Citas.Cita;
+
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 
 public abstract class Usuario {

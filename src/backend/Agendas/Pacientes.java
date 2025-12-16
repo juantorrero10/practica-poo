@@ -1,13 +1,12 @@
-package Agendas;
+package backend.Agendas;
 
-import Reestricion.Reestricion;
-import Usuarios.Paciente;
-import Usuarios.Usuario;
+import backend.Reestricion.Reestricion;
+import backend.Usuarios.Paciente;
+import backend.Usuarios.Usuario;
 
 import java.rmi.AccessException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class Pacientes {
     private static ArrayList<Paciente> pacientes;
