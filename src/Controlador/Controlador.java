@@ -6,6 +6,8 @@ import backend.Agendas.AgendaCitas;
 import backend.Agendas.AgendaConsultas;
 import backend.Agendas.Pacientes;
 import backend.Agendas.Plantilla;
+import backend.Enumeradores.Centros;
+import backend.Enumeradores.Especialidades;
 import backend.Usuarios.*;
 import CSV.*;
 
@@ -26,6 +28,11 @@ public class Controlador {
     private Medico loginMedico;
     private AdminCentroSalud loginAdminC;
     private Admin loginAdmin;
+
+    private String rutaPacientes = "";
+    private String rutaPlantilla = "";
+    private String rutaCitas = "";
+    private String rutaConsultas = "";
 
     // Oyentes
     private List<OyenteSesion> oyentes;
@@ -56,15 +63,17 @@ public class Controlador {
                 a,
                 c
         );
+        rutaPacientes = CSVPacientes;
+        rutaPlantilla = CSVPlantilla;
     }
 
     public Controlador(String CSVPacientes, String CSVPlantilla, String CSVCitas, String CSVHistoriales) {
         //TODO: Cargar fichero
     }
 
-    public void notificarCambioSesion(Usuario usuario, TipoUsuario tipoUsuario) {
+    public void notificarCambioSesion(Usuario usuario, TipoUsuario tipoUsuario, boolean cambiarPest) {
         for (OyenteSesion oyente : oyentes) {
-            oyente.onSesionUpdate(usuario, tipoUsuario);
+            oyente.onSesionUpdate(usuario, tipoUsuario, cambiarPest);
         }
     }
 
@@ -118,16 +127,16 @@ public class Controlador {
         Log.INFO("Cierre de Sesion del tipo: "+tp.toString());
         switch (tp) {
             case ADMIN:
-                if (loginAdmin != null) { notificarCambioSesion(null, tp); loginAdmin = null; return true; }
+                if (loginAdmin != null) { notificarCambioSesion(null, tp, true); loginAdmin = null; return true; }
                 break;
             case MEDICO:
-                if (loginMedico != null) { notificarCambioSesion(null, tp); loginMedico = null; return true; }
+                if (loginMedico != null) { notificarCambioSesion(null, tp, true); loginMedico = null; return true; }
                 break;
             case ADMINCENTRO:
-                if (loginAdminC != null) { notificarCambioSesion(null, tp); loginAdminC = null; return true; }
+                if (loginAdminC != null) { notificarCambioSesion(null, tp, true); loginAdminC = null; return true; }
                 break;
             case PACIENTE:
-                if (loginPaciente != null) { notificarCambioSesion(null, tp); loginPaciente = null; return true; }
+                if (loginPaciente != null) { notificarCambioSesion(null, tp, true); loginPaciente = null; return true; }
                 break;
         }
         return false;
@@ -142,16 +151,16 @@ public class Controlador {
         }
         switch (tp) {
             case ADMIN:
-                if (loginAdmin == null)  { loginAdmin = (Admin) usuario; notificarCambioSesion(usuario, tp); return true; }
+                if (loginAdmin == null)  { loginAdmin = (Admin) usuario; notificarCambioSesion(usuario, tp, true); return true; }
                 break;
             case PACIENTE:
-                if (loginPaciente == null)  { loginPaciente = (Paciente) usuario; notificarCambioSesion(usuario, tp); return true; }
+                if (loginPaciente == null)  { loginPaciente = (Paciente) usuario; notificarCambioSesion(usuario, tp, true); return true; }
                 break;
             case MEDICO:
-                if (loginMedico == null)  { loginMedico = (Medico) usuario; notificarCambioSesion(usuario, tp); return true;}
+                if (loginMedico == null)  { loginMedico = (Medico) usuario; notificarCambioSesion(usuario, tp, true); return true;}
                 break;
             case ADMINCENTRO:
-                if (loginAdminC == null)  { loginAdminC = (AdminCentroSalud) usuario; notificarCambioSesion(usuario, tp); return true;}
+                if (loginAdminC == null)  { loginAdminC = (AdminCentroSalud) usuario; notificarCambioSesion(usuario, tp, true); return true;}
                 break;
             default:
                 Log.WARN("el tipo de usuario no es válido: " + tp.ordinal());
@@ -210,5 +219,111 @@ public class Controlador {
         return null;
     }
 
+    public int crearUsuario(Usuario u) {
+
+        Log.INFO("Nuevo usuario");
+
+
+        if ( !(listaPacientes.verificarCIPA(u.getCIPA())
+                && plantilla.verificarCIPA(u.getCIPA()))  ) {
+            Log.WARN("El CIPA esta ocupado");
+            return 1;
+        }
+
+
+        if (u instanceof Paciente) {
+            listaPacientes.agregarPaciente((Paciente) u);
+            Log.INFO("Nuevo Paciente -> " + u.toString());
+            new PacientesCSV(rutaPacientes).exportarPacientes(listaPacientes);
+            return 0;
+
+        } else {
+            switch (u.getTipoUsuario()) {
+                case ADMIN:
+                    plantilla.agregarAdministrador((Admin) u);
+                    break;
+                case ADMINCENTRO:
+                    plantilla.agregarAdministradorCentro((AdminCentroSalud) u);
+                    break;
+                case MEDICO:
+                    plantilla.agregarMedico((Medico) u);
+                    break;
+                default:
+                    Log.ERR("Tipo invalido de: " + u.toString());
+                    return 2;
+            }
+        }
+
+        new PlantillaCSV(rutaPlantilla).exportarPlantilla(plantilla);
+        Log.INFO("Nuevo usuario -> (" + u.getTipoUsuario() + ") " + u.toString());
+        return 0;
+    }
+
+    public boolean borrarUsuario(long CIPA) {
+        Usuario u = null;
+        if (!listaPacientes.verificarCIPA(CIPA)) {
+            u = listaPacientes.identificarPaciente(CIPA);
+        } else {
+            u = plantilla.getUsuarioCIPA(CIPA);
+        }
+
+        if (u == null) {
+            Log.WARN("EL usuario con CIPA: " + CIPA + " no existe");
+            return false;
+        }
+
+        if (u.getTipoUsuario() == TipoUsuario.PACIENTE) {
+            listaPacientes.borrarPaciente((Paciente) u);
+            new PacientesCSV(rutaPacientes).exportarPacientes(listaPacientes);
+        } else {
+            plantilla.borrarUsuario(u);
+            new PlantillaCSV(rutaPlantilla).exportarPlantilla(plantilla);
+        }
+
+        return true;
+    }
+
+    public boolean modificarUsuario(Usuario u,
+                                    String DNI,
+                                    String nombre,
+                                    String direccion,
+                                    long telefono,
+                                    Especialidades especialidad,
+                                    Centros centro) {
+
+        if (u == null) return false;
+
+        if (DNI.isEmpty()) {
+            DNI = u.getDNI();
+        }
+
+        switch (u.getTipoUsuario()) {
+            case ADMIN:
+                plantilla.cambiarAdministrador((Admin) u, new Admin(DNI, u.getCIPA()));
+                break;
+            case ADMINCENTRO:
+                if (centro == Centros.NO_ESPECIFICADO) centro = ((AdminCentroSalud)u).getCentro();
+                plantilla.cambiarAdCentro((AdminCentroSalud) u, new AdminCentroSalud(DNI, u.getCIPA(), centro));
+                break;
+            case MEDICO:
+                if (centro == Centros.NO_ESPECIFICADO) centro = ((Medico)u).getCentro();
+                if (especialidad == Especialidades.NO_ESPECIFICADO) especialidad = ((Medico)u).getEspecialidad();
+                plantilla.cambiarMedico((Medico) u, new Medico(DNI, u.getCIPA(), especialidad, centro));
+                break;
+            case PACIENTE:
+                if (nombre.isEmpty()) nombre = ((Paciente)u).getNombreCompleto();
+                if (direccion.isEmpty()) direccion = ((Paciente)u).getDireccion();
+                if (telefono == -1) telefono = ((Paciente)u).getTelefono();
+                listaPacientes.cambiarPaciente((Paciente) u, new Paciente(nombre, direccion, telefono, DNI, u.getCIPA()));
+                break;
+            default:
+                Log.ERR("Tipo invalido de: " + u.toString());
+        }
+
+        new PlantillaCSV(rutaPlantilla).exportarPlantilla(plantilla);
+        new PacientesCSV(rutaPacientes).exportarPacientes(listaPacientes);
+        return true;
+
+    }
 
 }

@@ -25,6 +25,7 @@ public class PlantillaCSV extends ProcesadorCSV {
      */
 
     public boolean exportarPlantilla(Plantilla p) {
+
         ArrayList<String[]> cont = new ArrayList<>();
         for(Medico m : p.getMedicos()) {
             cont.add( new String[] {

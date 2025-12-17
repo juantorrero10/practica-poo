@@ -5,6 +5,7 @@ import backend.Enumeradores.Especialidades;
 import backend.Usuarios.Admin;
 import backend.Usuarios.AdminCentroSalud;
 import backend.Usuarios.Medico;
+import backend.Usuarios.Usuario;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,15 +69,68 @@ public class Plantilla {
         return listaEsp.get(idx);
     }
 
+    public boolean verificarCIPA(long CIPA) {
+        Admin a = new Admin(null, CIPA);
+        Medico m = new Medico(null, CIPA, null, null);
+        AdminCentroSalud ac =  new AdminCentroSalud(null, CIPA, null);
+        if (!administradores.contains(a) && !medicos.contains(m) && !administradoresCentroSalud.contains(ac)) {
+            return true;
+        } return false;
+    }
+
     public void agregarAdministrador(Admin nuevo)  {
-        if(!administradores.contains(nuevo)) administradores.add(nuevo);
+        if(verificarCIPA(nuevo.getCIPA())) administradores.add(nuevo);
     }
     public void agregarMedico(Medico nuevo) {
-        if(!medicos.contains(nuevo)) medicos.add(nuevo);
+        if(verificarCIPA(nuevo.getCIPA())) medicos.add(nuevo);
     }
     public void agregarAdministradorCentro(AdminCentroSalud nuevo) {
-        if(!administradoresCentroSalud.contains(nuevo)) {
+        if(verificarCIPA(nuevo.getCIPA()))
             administradoresCentroSalud.add(nuevo);
+    }
+
+    public Usuario getUsuarioCIPA(long CIPA) {
+        for (Admin a : administradores) {
+            if (a.getCIPA() == CIPA) { return a; }
+        } for (Medico m : medicos) {
+            if (m.getCIPA() == CIPA) { return m; }
+        } for (AdminCentroSalud a : administradoresCentroSalud) {
+            if (a.getCIPA() == CIPA) { return a; }
+        }
+        return null;
+    }
+
+    public boolean cambiarAdministrador(Admin a, Admin b) {
+        int idx = administradores.indexOf(a);
+        if (idx != -1) {
+            administradores.set(idx, b); return true;
+        }
+        return false;
+    }
+
+    public boolean cambiarMedico(Medico a, Medico b) {
+        int idx = medicos.indexOf(a);
+        if (idx != -1) {
+            medicos.set(idx, b); return true;
+        }
+        return false;
+    }
+
+    public boolean cambiarAdCentro(AdminCentroSalud a, AdminCentroSalud b) {
+        int idx = administradoresCentroSalud.indexOf(a);
+        if (idx != -1) {
+            administradoresCentroSalud.set(idx, b); return true;
+        }
+        return false;
+    }
+
+    public void borrarUsuario(Usuario u) {
+        if ( administradores.contains(u) ) {
+            administradores.remove(u);
+        } else if (medicos.contains(u) ) {
+            medicos.remove(u);
+        } else if (administradoresCentroSalud.contains(u) ) {
+            administradoresCentroSalud.remove(u);
         }
     }
 

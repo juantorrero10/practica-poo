@@ -4,6 +4,7 @@ import Controlador.Controlador;
 import Controlador.TipoUsuario;
 import backend.Usuarios.Paciente;
 import backend.Usuarios.Usuario;
+import interfaz.Dialog.DialogOpcionesUsuario;
 
 import javax.swing.*;
 import java.awt.*;
@@ -41,7 +42,14 @@ public abstract class Panel extends JPanel {
 
         barra.add(labelUsuario, BorderLayout.WEST);
 
-        // ---- DERECHA (cerrar sesión) ----
+        // ---- DERECHA (opciones + cerrar sesión) ----
+        JPanel derecha = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+
+        JButton botonOpciones = new JButton("Opciones");
+        botonOpciones.setFocusPainted(false);
+
+        botonOpciones.addActionListener(e -> abrirDialogoOpciones(tp));
+
         botonCerrarSesion = new JButton("Cerrar sesión");
         botonCerrarSesion.setForeground(Color.RED);
         botonCerrarSesion.setFocusPainted(false);
@@ -51,11 +59,14 @@ public abstract class Panel extends JPanel {
 
         botonCerrarSesion.addActionListener(e -> controlador.cerrarSesion(tp));
 
-        barra.add(botonCerrarSesion, BorderLayout.EAST);
+        derecha.add(botonOpciones);
+        derecha.add(botonCerrarSesion);
+
+        barra.add(derecha, BorderLayout.EAST);
 
         add(barra, BorderLayout.NORTH);
-
     }
+
 
     public void actualizarLabelUsuario(Usuario u) {
         Paciente pac;
@@ -81,6 +92,20 @@ public abstract class Panel extends JPanel {
         texto.append("</span></html>");
 
         labelUsuario.setText(texto.toString());
+    }
+
+    private void abrirDialogoOpciones(TipoUsuario tp) {
+        Usuario u = controlador.getLoginUsuario(tp);
+        if (u == null) return;
+
+        DialogOpcionesUsuario dialogo =
+                new DialogOpcionesUsuario(
+                        SwingUtilities.getWindowAncestor(this),
+                        u,
+                        controlador
+                );
+
+        dialogo.setVisible(true); // MODAL → bloquea hasta cerrar
     }
 
 }

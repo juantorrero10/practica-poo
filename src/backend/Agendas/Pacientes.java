@@ -30,6 +30,13 @@ public class Pacientes {
         return false;
     }
 
+    public boolean verificarCIPA(long CIPA) {
+        for (Paciente p : pacientes) {
+            if (p.getCIPA() == CIPA) return false;
+        }
+        return true;
+    }
+
     public List<Paciente> getPacientes(){
         return pacientes;
     }
@@ -41,5 +48,22 @@ public class Pacientes {
             s += "\n";
         }
         return s;
+    }
+
+    public boolean borrarPaciente(Paciente p) {
+        if (pacientes.contains(p)) {
+            pacientes.remove(p);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean cambiarPaciente(Paciente a, Paciente b) {
+        int idx = pacientes.indexOf(a);
+        if (idx != -1) {
+            pacientes.set(idx, b);
+            return true;
+        }
+        return false;
     }
 }

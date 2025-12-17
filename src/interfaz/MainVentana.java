@@ -72,29 +72,29 @@ public class MainVentana extends JFrame implements OyenteSesion {
 
 
     @Override
-    public void onSesionUpdate(Usuario usuario, TipoUsuario tipoUsuario) {
+    public void onSesionUpdate(Usuario usuario, TipoUsuario tipoUsuario, boolean cambiarPest) {
         boolean flag = usuario != null;
         Log.INFO("SessionUpdate -> flag: " + flag + ", type: " + tipoUsuario);
 
         switch(tipoUsuario) {
             case TipoUsuario.PACIENTE:
                 tabs.setEnabledAt(tabPaciente, flag);
-                tabs.setSelectedIndex(!flag ? tabAutentificar : tabPaciente);
+                if (cambiarPest)tabs.setSelectedIndex(!flag ? tabAutentificar : tabPaciente);
                 pPaciente.actualizarLabelUsuario(usuario);
                 break;
             case TipoUsuario.ADMIN:
                 tabs.setEnabledAt(tabAdmin, flag);
-                tabs.setSelectedIndex(!flag ? tabAutentificar : tabAdmin);
+                if (cambiarPest)tabs.setSelectedIndex(!flag ? tabAutentificar : tabAdmin);
                 pAdmin.actualizarLabelUsuario(usuario);
                 break;
             case TipoUsuario.ADMINCENTRO:
                 tabs.setEnabledAt(tabAdminCentro, flag);
-                tabs.setSelectedIndex(!flag ? tabAutentificar : tabAdminCentro);
+                if (cambiarPest)tabs.setSelectedIndex(!flag ? tabAutentificar : tabAdminCentro);
                 pCentro.actualizarLabelUsuario(usuario);
                 break;
             case TipoUsuario.MEDICO:
                 tabs.setEnabledAt(tabMedico, flag);
-                tabs.setSelectedIndex(!flag ? tabAutentificar : tabMedico);
+                if (cambiarPest)tabs.setSelectedIndex(!flag ? tabAutentificar : tabMedico);
                 pMedico.actualizarLabelUsuario(usuario);
                 break;
 

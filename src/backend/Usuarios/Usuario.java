@@ -74,4 +74,12 @@ public abstract class Usuario {
     public TipoUsuario getTipoUsuario(){
         return TipoUsuario.getTipoUsuario(this);
     }
+
+    public boolean isAdmin() {
+        TipoUsuario tp = getTipoUsuario();
+        if (tp.equals(TipoUsuario.ADMIN) ||  tp.equals(TipoUsuario.ADMINCENTRO)) {
+            return true;
+        }
+        return false;
+    }
 }

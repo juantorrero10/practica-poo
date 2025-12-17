@@ -148,17 +148,6 @@ public class Medico extends Usuario{
     }
 
     @Override
-    public boolean equals(Object o) {
-        if(this==o) return true;
-
-        if(o==null || this.getClass()!=o.getClass()) return false;
-
-        Medico m = (Medico) o;
-
-        return (this.getDNI().equals(m.getDNI()));
-    }
-
-    @Override
     public String toString() {
         return super.toString()  + ", especialidad = " + especialidad + ", Centro = " + centro ;
     }
