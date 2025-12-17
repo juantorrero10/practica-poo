@@ -7,7 +7,7 @@ public enum TipoUsuario {
     PACIENTE("Paciente"),
     MEDICO("Médico"),
     ADMINCENTRO("Admin Centro de Salud"),
-    ADMIN("Super usuario");
+    ADMIN("Admin");
 
     private final String t;
 

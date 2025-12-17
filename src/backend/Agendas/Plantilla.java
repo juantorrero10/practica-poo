@@ -19,9 +19,16 @@ public class Plantilla {
     private final Random random;
 
     public Plantilla() {
-        administradores = new ArrayList<>();
-        medicos = new ArrayList<>();
-        administradoresCentroSalud = new ArrayList<>();
+        this(new ArrayList<>(),
+            new ArrayList<>(),
+            new ArrayList<>());
+    }
+
+    public Plantilla(ArrayList<Admin> ad, ArrayList<Medico> med, ArrayList<AdminCentroSalud> adC) {
+        administradores = ad;
+        medicos = med;
+        administradoresCentroSalud = adC;
+
         random = new Random();
     }
 

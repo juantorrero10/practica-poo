@@ -7,7 +7,9 @@ import backend.Agendas.AgendaConsultas;
 import backend.Agendas.Pacientes;
 import backend.Agendas.Plantilla;
 import backend.Usuarios.*;
+import CSV.*;
 
+import java.lang.management.PlatformManagedObject;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,6 +48,20 @@ public class Controlador {
         this(new Plantilla(), new Pacientes(), new AgendaConsultas(), new AgendaCitas());
     }
 
+    //Temporal
+    public Controlador(Plantilla p, String CSVPacientes, AgendaConsultas a, AgendaCitas c) {
+        this(
+                p,
+                new PacientesCSV(CSVPacientes).importarPacientes(),
+                a,
+                c
+        );
+    }
+
+    public Controlador(String CSVPacientes, String CSVPlantilla, String CSVCitas, String CSVHistoriales) {
+        //TODO: Cargar fichero
+    }
+
     public void notificarCambioSesion(Usuario usuario, TipoUsuario tipoUsuario) {
         for (OyenteSesion oyente : oyentes) {
             oyente.onSesionUpdate(usuario, tipoUsuario);
@@ -56,9 +72,7 @@ public class Controlador {
         oyentes.add(l);
     }
 
-    public Controlador(String RutaFicheroCSV) {
-        //TODO: Cargar fichero
-    }
+
 
     public String stringGetUsuarios() {
         String usuarios = "";

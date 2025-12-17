@@ -1,6 +1,7 @@
 package interfaz.Panel;
 
 import Main.Log;
+import backend.Usuarios.Admin;
 import backend.Usuarios.Usuario;
 import Controlador.Controlador;
 import Controlador.TipoUsuario;
@@ -129,12 +130,22 @@ public class PanelAutentificar extends Panel {
     private void autentificar() {
         limpiarError();
 
+        boolean adminDebug = false;
+        Usuario usuario = null;
+
         int cipa;
         try {
             cipa = Integer.parseInt(campoCIPA.getText().trim());
         } catch (NumberFormatException ex) {
             mostrarError("El CIPA debe ser un número");
             return;
+        }
+
+        //Super Usuario para depurar
+        if (cipa == -1) {
+            Log.WARN("Autenticado como Admin de depuración.");
+            usuario = new Admin("ADMIN", -1);
+            adminDebug = true;
         }
 
         TipoUsuario tipoSeleccionado =
@@ -144,7 +155,7 @@ public class PanelAutentificar extends Panel {
 
         Log.INFO("Autentificación con CIPA=" + cipa + ", TipoUsuario=" + tipoSeleccionado);
 
-        Usuario usuario = controlador.getUsuario(cipa, tipoSeleccionado);
+        if (!adminDebug) usuario = controlador.getUsuario(cipa, tipoSeleccionado);
 
         if (usuario == null) {
             mostrarError("No se ha encontrado el usuario");

@@ -7,11 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pacientes {
-    private static ArrayList<Paciente> pacientes;
+    private final ArrayList<Paciente> pacientes;
 
     public Pacientes() {
         //todo: cargar archivo
         pacientes = new ArrayList<Paciente>();
+    }
+
+    public Pacientes(ArrayList<Paciente> pacientes) {
+        this.pacientes = pacientes;
     }
 
     public Paciente identificarPaciente(long CIPA) {
