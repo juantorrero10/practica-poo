@@ -33,6 +33,20 @@ public enum TipoUsuario {
         }
         return NO_ESPECIFICADO;
     }
+
+    public static TipoUsuario fromString(String texto) {
+        if (texto == null) {
+            return NO_ESPECIFICADO;
+        }
+
+        for (TipoUsuario t : values()) {
+            if (t.t.equalsIgnoreCase(texto.trim())) {
+                return t;
+            }
+        }
+
+        return NO_ESPECIFICADO;
+    }
 }
 
 

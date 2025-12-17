@@ -49,9 +49,9 @@ public class Controlador {
     }
 
     //Temporal
-    public Controlador(Plantilla p, String CSVPacientes, AgendaConsultas a, AgendaCitas c) {
+    public Controlador(String CSVPlantilla, String CSVPacientes, AgendaConsultas a, AgendaCitas c) {
         this(
-                p,
+                new PlantillaCSV(CSVPlantilla).importarPlantilla(),
                 new PacientesCSV(CSVPacientes).importarPacientes(),
                 a,
                 c

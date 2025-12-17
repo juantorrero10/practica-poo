@@ -65,7 +65,7 @@ public class PlantillaCSV extends ProcesadorCSV {
         ArrayList<Admin> arrAdmin = new ArrayList<>();
 
         for (String[] fila : contenido) {
-            switch (TipoUsuario.valueOf(fila[0])) {
+            switch (TipoUsuario.fromString(fila[0])) {
                 case ADMIN:
                     arrAdmin.add(new Admin(
                             fila[1],
@@ -76,15 +76,15 @@ public class PlantillaCSV extends ProcesadorCSV {
                     arrAdCentro.add(new AdminCentroSalud(
                             fila[1],
                             Long.parseLong(fila[2]),
-                            Centros.valueOf(fila[3])
+                            Centros.valueOf(fila[4])
                         ));
                     break;
                 case MEDICO:
                     arrMedicos.add(new Medico(
                             fila[1],
                             Long.parseLong(fila[2]),
-                            Especialidades.valueOf(fila[4]),
-                            Centros.valueOf(fila[3])
+                            Especialidades.valueOf(fila[3]),
+                            Centros.valueOf(fila[4])
                     ));
                     break;
                 default:

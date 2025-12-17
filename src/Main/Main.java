@@ -1,6 +1,7 @@
 package Main;
 
 
+import CSV.PlantillaCSV;
 import backend.Agendas.AgendaCitas;
 import backend.Agendas.AgendaConsultas;
 import backend.Agendas.Plantilla;
@@ -24,21 +25,11 @@ public class Main {
         inicializarSistemaArchivos();
 
         //Inicializacion temporal.
-        Plantilla plantilla = new Plantilla();
         AgendaConsultas agendaConsultas = new AgendaConsultas();
         AgendaCitas citas = new AgendaCitas();
 
-        Medico m1 = new Medico("11112222A", 101, Especialidades.CARDIOLOGIA, Centros.HOSPITAL_UNIVERSITARIO_DE_FUENLABRADA);
-        Medico m2 = new Medico("33334444Z", 102, Especialidades.PEDIATRIA, Centros.HOSPITAL_UNIVERSITARIO_PRINCIPE_DE_ASTURIAS);
-        AdminCentroSalud administrador = new AdminCentroSalud("44556677M", 4001, Centros.HOSPITAL_UNIVERSITARIO_TORREJON);
-        Admin admin = new Admin("84754928O", 5000);
+        Controlador c = new Controlador("datos/Plantilla.csv", "datos/Pacientes.csv", agendaConsultas, citas);
 
-        plantilla.agregarMedico(m1);
-        plantilla.agregarMedico(m2);
-        plantilla.agregarAdministradorCentro(administrador);
-        plantilla.agregarAdministrador(admin);
-
-        Controlador c = new Controlador(plantilla, "datos/Pacientes.csv", agendaConsultas, citas);
 
         Log.INFO("Usuarios en el sistema: ");
         System.out.println(c.stringGetUsuarios());
