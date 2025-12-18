@@ -6,12 +6,14 @@ import backend.Agendas.AgendaCitas;
 import backend.Agendas.AgendaConsultas;
 import backend.Agendas.Pacientes;
 import backend.Agendas.Plantilla;
+import backend.Citas.Cita;
 import backend.Enumeradores.Centros;
 import backend.Enumeradores.Especialidades;
 import backend.Usuarios.*;
 import CSV.*;
 
-import java.lang.management.PlatformManagedObject;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -324,6 +326,55 @@ public class Controlador {
         new PacientesCSV(rutaPacientes).exportarPacientes(listaPacientes);
         return true;
 
+    }
+
+    public int crearCitaPaciente(
+            Especialidades especialidad,
+            LocalDateTime fecha
+
+    ) {
+        Log.INFO("crearCita -> esp: " + especialidad);
+
+        if (especialidad == Especialidades.NO_ESPECIFICADO) {
+            Log.ERR("Especialidad no válido.");
+            return 1;
+        }
+
+        boolean pedirProximaDisponible = fecha.isEqual(LocalDateTime.now());
+        Medico med = plantilla.encontrarEspecilistaAleatorio(especialidad);
+
+        Cita cita = new Cita(fecha, loginPaciente, med);
+
+
+        // Comprobar disponibilidad global
+        if (!pedirProximaDisponible && !med.getAgenda().comprobarDisponibilidad(cita)) {
+            Log.WARN("El médico no está disponible en esa fecha/hora");
+            return 2;
+        }
+
+        if (pedirProximaDisponible) {
+            LocalDate ld = med.encontrarProximoDiaDisponible(LocalDate.now(), 0);
+            cita.setFechaHora(
+                    LocalDateTime.of(
+                            ld,
+                            med.encontrarPrimeraHoraDisponible(ld))
+            );
+        }
+
+        // Añadir a la agenda del médico (comprueba límite diario)
+        if (!med.anadirCita(cita)) {
+            Log.ERR("El médico ha alcanzado el máximo de citas diarias");
+            return 3;
+        }
+
+        // Añadir a la agenda del paciente
+        if (!citas.agregarCita(cita, 20)) {
+            Log.ERR("No se pudo agregar la cita");
+            return 4;
+        }
+
+        Log.INFO("Cita creada correctamente -> \n\t" + cita);
+        return 0;
     }
 
 }

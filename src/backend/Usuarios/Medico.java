@@ -1,5 +1,6 @@
 package backend.Usuarios;
 
+import backend.Agendas.AgendaCitas;
 import backend.Citas.Cita;
 import backend.Enumeradores.*;
 import backend.Enumeradores.Centros;
@@ -15,7 +16,7 @@ import java.util.List;
 public class Medico extends Usuario{
 
     private static final int MAXCITASDIARIAS = 20;
-    private ArrayList<Cita> agendaCitas;
+    private AgendaCitas agendaCitas;
     private Especialidades especialidad;
     private Centros centro;
 
@@ -26,7 +27,7 @@ public class Medico extends Usuario{
         super(DNI,CIPA);
         this.especialidad = especialidad;
         this.centro = c;
-        agendaCitas = new ArrayList<>();
+        agendaCitas = new AgendaCitas();
     }
 
     public Especialidades getEspecialidad() {
@@ -37,7 +38,7 @@ public class Medico extends Usuario{
         return this.centro;
     }
 
-    public List<Cita> getAgenda() {
+    public AgendaCitas getAgenda() {
         return agendaCitas;
     }
 
@@ -45,15 +46,15 @@ public class Medico extends Usuario{
     public boolean anadirCita(Cita c) {
         if (c == null) return false;
         if (getCitasParaDia(c.getFechaHora().toLocalDate()) >= MAXCITASDIARIAS ||
-            agendaCitas.contains(c)) {
+            agendaCitas.getCitas().contains(c)) {
             return false;
         }
-        agendaCitas.add(c);
+        agendaCitas.getCitas().add(c);
         return true;
     }
 
     public void visualizarCitas(){
-        for(Cita cita: agendaCitas){
+        for(Cita cita: agendaCitas.getCitas()){
             System.out.println(cita.toString());
         }
     }
@@ -77,7 +78,7 @@ public class Medico extends Usuario{
 
         //Creamos un set de las horas ya ocupadas para ese día para controlar repetidos
         HashSet<LocalTime> horasOcupadas = new HashSet<>();
-        for (Cita cita : agendaCitas) {
+        for (Cita cita : agendaCitas.getCitas()) {
             if (cita.getFechaHora().toLocalDate().isEqual(fecha) && !cita.isAnulada()) {
                 // Añadimos solo la hora al set
                 horasOcupadas.add(cita.getFechaHora().toLocalTime());
@@ -103,7 +104,7 @@ public class Medico extends Usuario{
     public int getCitasParaDia(LocalDate fecha) {
         int contador = 0;
 
-        for (Cita cita : agendaCitas) {
+        for (Cita cita : agendaCitas.getCitas()) {
             if (!cita.isAnulada() && cita.getFechaHora().toLocalDate().isEqual(fecha)) {
                 contador++;
             }
@@ -115,7 +116,7 @@ public class Medico extends Usuario{
     public int reagendarCitas(LocalDate antigua){
         //Contamos cuántas citas activas hay en el día antiguo que necesitan ser movidas
         int citasAMover = 0;
-        for(Cita cita : agendaCitas) {
+        for(Cita cita : agendaCitas.getCitas()) {
             if (!cita.isAnulada() && cita.getFechaHora().toLocalDate().isEqual(antigua)) {
                 citasAMover++;
             }
@@ -131,7 +132,7 @@ public class Medico extends Usuario{
         int citasMovidas = 0;
 
         //encontramos y movemos las citas
-        for(Cita cita : agendaCitas) {
+        for(Cita cita : agendaCitas.getCitas()) {
 
             if (!cita.isAnulada() && cita.getFechaHora().toLocalDate().isEqual(antigua)) {
 

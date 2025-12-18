@@ -17,6 +17,9 @@ public abstract class ProcesadorCSV {
     private static final String SEPELEMENTO = ";";
 
     ProcesadorCSV(String Ruta) {
+        if (Ruta.isEmpty()) {
+            return;
+        }
         try {
             fichero = Paths.get(Ruta);
         } catch (InvalidPathException e) {
@@ -69,6 +72,7 @@ public abstract class ProcesadorCSV {
 
         return contenido;
     }
+
 
     public ArrayList<String[]> importarCSV() { return importarCSV(fichero); }
 }

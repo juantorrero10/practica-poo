@@ -19,6 +19,7 @@ public class Consulta {
     private final String motivo;
     private final TipoConsulta tipoConsulta;
     private final TipoInforme tipoInforme;
+    private String rutaInforme;
     private final Centros centro;
     private final Medico medico;
     //Puede ser nulo
@@ -47,6 +48,10 @@ public class Consulta {
         }else{
             this.tipoConsulta = tipoConsulta;
         }
+    }
+
+    public void setRutaInforme(String rutaInforme) {
+        this.rutaInforme = rutaInforme;
     }
 
     public void recetarMedicamento(Medicamento med) {

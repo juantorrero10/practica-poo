@@ -19,6 +19,10 @@ public class AgendaCitas {
     public AgendaCitas() {
         citas = new ArrayList<>();
     }
+
+    public AgendaCitas(ArrayList<Cita> citas) {
+        this.citas = citas;
+    }
     private void anadirCitas(Cita cita) {
         citas.add(cita);
     }
@@ -127,7 +131,7 @@ public class AgendaCitas {
         }
     }
 
-    public List<Cita> getCitas(Usuario u){
+    public List<Cita> getCitas(){
         return citas;
     }
 

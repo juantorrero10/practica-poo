@@ -12,8 +12,8 @@ public class Cita {
     private Medico medico;
 
     private boolean anulada;
-    private String causaAnulacion;
-    private LocalDateTime fechaCancelacion;
+    private String causaAnulacion = "";
+    private LocalDateTime fechaCancelacion = null;
 
 
     public Cita(LocalDateTime fechaHora , Paciente paciente, Medico medico) {
@@ -53,9 +53,17 @@ public class Cita {
         return null;
     }
 
+    public void setFechaCancelacion(LocalDateTime fechaCancelacion) {
+        this.fechaCancelacion = fechaCancelacion;
+    }
+
     public String imprimirFechaHora(){
         DateTimeFormatter f =DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm ");
         return  this.fechaHora.format(f);
+    }
+
+    public void setFechaHora (LocalDateTime fh) {
+        this.fechaHora = fh;
     }
 
     public boolean isAnulada() {
@@ -88,6 +96,10 @@ public class Cita {
 
         return (this.fechaHora.equals(c.fechaHora) && this.paciente.equals(c.paciente)
                 && this.medico.equals(c.medico));
+    }
+
+    public LocalDateTime getFechaCancelacion() {
+        return fechaCancelacion;
     }
 
     @Override
