@@ -11,6 +11,7 @@ import backend.Usuarios.Usuario;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class DialogOpcionesUsuario extends JDialog {
 
@@ -132,7 +133,13 @@ public class DialogOpcionesUsuario extends JDialog {
         gbc.gridy = 0;
 
         JButton botonAplicar = new JButton("Aplicar");
-        botonAplicar.addActionListener(e -> aplicarCambios());
+        botonAplicar.addActionListener(e -> {
+            try {
+                aplicarCambios();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         labelError = new JLabel("");
         labelError.setForeground(Color.RED);
@@ -154,7 +161,7 @@ public class DialogOpcionesUsuario extends JDialog {
         setLabelError("No puede haber un campo vacio.", Color.RED);
     }
 
-    private void aplicarCambios() {
+    private void aplicarCambios() throws IOException {
         setLabelError("", Color.GREEN);
         String nombre = "";
         String direccion = "";

@@ -2,6 +2,8 @@ package interfaz.Panel.subPaneles;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+
 import Controlador.Controlador;
 import Controlador.TipoUsuario;
 import backend.Enumeradores.*;
@@ -105,7 +107,13 @@ public class PanelModificarUsuario extends JPanel {
     private void registrarEventos() {
         selectorTipo.addActionListener(e -> cambiarPanel());
         cambiarPanel(); // inicial
-        botonModificar.addActionListener(e -> modificarUsuario());
+        botonModificar.addActionListener(e -> {
+            try {
+                modificarUsuario();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     private void layoutComponentes() {
@@ -153,7 +161,7 @@ public class PanelModificarUsuario extends JPanel {
         cardLayout.show(panelExtra, tipo.name());
     }
 
-    private void modificarUsuario() {
+    private void modificarUsuario() throws IOException {
         String cipaStr = campoCipa.getText();
         String dni = campoDni.getText();
         String nombre = "";

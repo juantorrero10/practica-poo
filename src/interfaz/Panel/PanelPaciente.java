@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class PanelPaciente extends Panel {
-    
+
 
 
     public PanelPaciente(Controlador c) {

@@ -111,7 +111,7 @@ public class AgendaCitas {
     public void actualizarCitas(Plantilla p) throws AccessException {
         ArrayList<Cita> lista = new ArrayList<>();
         for (Medico m : p.getMedicos()) {
-            lista.addAll(m.getAgenda());
+            lista.addAll(m.getAgenda().getCitas());
         }
         citas.clear();
         citas = lista;
@@ -123,7 +123,7 @@ public class AgendaCitas {
      */
     public void actualizarCitasCentro(Plantilla p, Centros c){
         for (Medico m : p.getMedicosCentro(c)) {
-            for (Cita cita : m.getAgenda()) {
+            for (Cita cita : m.getAgenda().getCitas()) {
                 if (!citas.contains(cita)) {
                     citas.add(cita);
                 }

@@ -12,6 +12,7 @@ import backend.Usuarios.*;
 import CSV.*;
 
 import javax.management.InvalidAttributeValueException;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -35,7 +36,7 @@ public class Controlador {
     private String rutaPacientes = "";
     private String rutaPlantilla = "";
     private String rutaCitas = "";
-    private String rutaConsultas = "";
+    private String carpetaHistoriales = "";
 
     // Oyentes
     private List<OyenteSesion> oyentes;
@@ -71,9 +72,16 @@ public class Controlador {
     }
 
     public void cargarHistoriales(String carpetaHistoriales) throws InvalidAttributeValueException {
+        this.carpetaHistoriales = carpetaHistoriales;
+
         //Crear historiales
         for(Paciente p : listaPacientes.getPacientes()){
-            Paths.get(carpetaHistoriales+"/"+p.getCIPA());
+            File file = new File(carpetaHistoriales+"/"+p.getCIPA()+".csv");
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                Log.INFO("Ya existe");
+            }
         }
 
 
@@ -84,10 +92,14 @@ public class Controlador {
         }
     }
 
-    public void exportarHistoriales(String carpetaHistoriales) throws InvalidAttributeValueException, IOException {
+    public void exportarHistoriales() throws IOException {
         for (Paciente p : listaPacientes.getPacientes()) {
             new HistorialesCSV(carpetaHistoriales).exportarHistorial(p);
         }
+    }
+
+    public void exportarHistorialPaciente(Paciente p) throws IOException {
+        new HistorialesCSV(carpetaHistoriales).exportarHistorial(p);
     }
 
     public Controlador(String CSVPacientes, String CSVPlantilla, String CSVCitas, String CSVHistoriales) {

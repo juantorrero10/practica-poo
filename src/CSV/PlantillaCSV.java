@@ -9,6 +9,7 @@ import backend.Usuarios.Admin;
 import backend.Usuarios.AdminCentroSalud;
 import backend.Usuarios.Medico;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class PlantillaCSV extends ProcesadorCSV {
@@ -24,7 +25,7 @@ public class PlantillaCSV extends ProcesadorCSV {
      * Centro:          <Centros>:         NULL -> "NO_ESPECIFICADO"
      */
 
-    public boolean exportarPlantilla(Plantilla p) {
+    public boolean exportarPlantilla(Plantilla p) throws IOException {
 
         ArrayList<String[]> cont = new ArrayList<>();
         for(Medico m : p.getMedicos()) {

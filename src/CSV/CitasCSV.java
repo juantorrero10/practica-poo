@@ -6,6 +6,7 @@ import backend.Agendas.Plantilla;
 import backend.Citas.Cita;
 import backend.Usuarios.Medico;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class CitasCSV extends ProcesadorCSV {
 
     }
 
-    public void exportarCitas(AgendaCitas ac) {
+    public void exportarCitas(AgendaCitas ac) throws IOException {
         ArrayList<String[]> contenido = new ArrayList<>();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy:HH:mm");
 

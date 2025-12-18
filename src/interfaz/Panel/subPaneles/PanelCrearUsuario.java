@@ -8,6 +8,7 @@ import backend.Usuarios.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class PanelCrearUsuario extends JPanel {
 
@@ -133,10 +134,16 @@ public class PanelCrearUsuario extends JPanel {
     private void registrarEventos() {
         selectorTipo.addActionListener(e -> cambiarPanel());
         cambiarPanel(); // inicial
-        botonCrear.addActionListener(e -> crearUsuario());
+        botonCrear.addActionListener(e -> {
+            try {
+                crearUsuario();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
-    private void crearUsuario() {
+    private void crearUsuario() throws IOException {
         setErrorLabel("", Color.GRAY);
         TipoUsuario tipoUsuario = (TipoUsuario) selectorTipo.getSelectedItem();
         long cipa = 0;

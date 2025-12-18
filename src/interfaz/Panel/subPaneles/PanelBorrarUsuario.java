@@ -7,6 +7,7 @@ import backend.Enumeradores.Especialidades;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
 public class PanelBorrarUsuario extends JPanel {
 
@@ -37,7 +38,13 @@ public class PanelBorrarUsuario extends JPanel {
     }
 
     private void registrarEventos() {
-        botonBorrar.addActionListener(e -> borrarUsuario());
+        botonBorrar.addActionListener(e -> {
+            try {
+                borrarUsuario();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
     private void layoutComponentes() {
@@ -56,7 +63,7 @@ public class PanelBorrarUsuario extends JPanel {
 
     }
 
-    private void borrarUsuario() {
+    private void borrarUsuario() throws IOException {
         setLabelError("", Color.RED);
         long CIPA = Long.parseLong(campoCipa.getText());
         if (controlador.borrarUsuario(CIPA)) {
