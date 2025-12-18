@@ -12,6 +12,10 @@ public class Laboratorio extends Prueba {
         this.informe = informe;
     }
 
+    public String getInforme() {
+        return informe;
+    }
+
     @Override
     public String toString() {
         return "Laboratorio " +

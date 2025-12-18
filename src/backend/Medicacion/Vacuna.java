@@ -9,6 +9,11 @@ import java.time.LocalDate;
 public class Vacuna extends Medicamento {
     private final LocalDate fechaSgteDosis;
 
+    public Vacuna(Medicamento m, LocalDate fechaSgteDosis) {
+        super(m);
+        this.fechaSgteDosis = fechaSgteDosis;
+    }
+
     public Vacuna(String nombre, int dosis, int frecuencia, TipoPreescripcion prescripcion,
                   LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaSgteDosis)
             throws InvalidAttributeValueException {

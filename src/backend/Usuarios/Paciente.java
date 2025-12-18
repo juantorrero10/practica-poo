@@ -130,6 +130,9 @@ public class Paciente extends Usuario{
     }
 
 
+    public void setHistorial(Historial historial) {
+        this.historial = historial;
+    }
 
     @Override
     public boolean equals(Object o) {

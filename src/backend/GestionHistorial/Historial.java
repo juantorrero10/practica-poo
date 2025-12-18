@@ -1,9 +1,11 @@
 package backend.GestionHistorial;
+import CSV.HistorialesCSV;
 import backend.Agendas.AgendaConsultas;
 import backend.Medicacion.Medicamento;
 import backend.Pruebas.Imagen;
 import backend.Pruebas.Laboratorio;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,7 @@ public class Historial {
         pruebasImagen = new ArrayList<>();
         pruebasLaboratorio = new ArrayList<>();
     }
+
 
 
     /**

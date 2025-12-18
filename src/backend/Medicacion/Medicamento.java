@@ -19,6 +19,15 @@ public class Medicamento {
     private LocalDate fechaFin;
 
 
+    public Medicamento(Medicamento m) {
+        this.nombre = m.nombre;
+        this.dosis = m.dosis;
+        this.frecuencia = m.frecuencia;
+        this.tipoPreescripcion = m.tipoPreescripcion;
+        this.fechaInicio = m.fechaInicio;
+        this.fechaFin = m.fechaFin;
+    }
+
     public Medicamento(
             String nombre,int dosis, int frecuencia,
             TipoPreescripcion tipoPreescripcion,
@@ -83,4 +92,8 @@ public class Medicamento {
     public boolean isCronico() { return tipoPreescripcion == TipoPreescripcion.CRONICO; }
     public LocalDate getFechaInicio() { return fechaInicio; }
     public LocalDate getFechaFin() { return fechaFin; }
+
+    public TipoPreescripcion getTipoPreescripcion() {
+        return tipoPreescripcion;
+    }
 }

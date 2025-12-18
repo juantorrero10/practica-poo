@@ -3,7 +3,6 @@ package Controlador;
 
 import Main.Log;
 import backend.Agendas.AgendaCitas;
-import backend.Agendas.AgendaConsultas;
 import backend.Agendas.Pacientes;
 import backend.Agendas.Plantilla;
 import backend.Citas.Cita;
@@ -12,6 +11,9 @@ import backend.Enumeradores.Especialidades;
 import backend.Usuarios.*;
 import CSV.*;
 
+import javax.management.InvalidAttributeValueException;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,7 +23,6 @@ public class Controlador {
 
     private Plantilla plantilla;
     private Pacientes listaPacientes;
-    private AgendaConsultas agendaConsultas;
     private AgendaCitas citas;
 
 
@@ -39,10 +40,8 @@ public class Controlador {
     // Oyentes
     private List<OyenteSesion> oyentes;
 
-    public Controlador(Plantilla p, Pacientes pa, AgendaConsultas a, AgendaCitas c) {
+    public Controlador(Plantilla p, Pacientes pa) {
         this.plantilla = p;
-        this.agendaConsultas = a;
-        this.citas = c;
         this.listaPacientes = pa;
 
         loginPaciente = null;
@@ -54,19 +53,41 @@ public class Controlador {
     }
 
     public Controlador() {
-        this(new Plantilla(), new Pacientes(), new AgendaConsultas(), new AgendaCitas());
+        this(new Plantilla(), new Pacientes());
     }
 
     //Temporal
-    public Controlador(String CSVPlantilla, String CSVPacientes, AgendaConsultas a, AgendaCitas c) {
+    public Controlador(String CSVPlantilla, String CSVPacientes) {
         this(
                 new PlantillaCSV(CSVPlantilla).importarPlantilla(),
-                new PacientesCSV(CSVPacientes).importarPacientes(),
-                a,
-                c
+                new PacientesCSV(CSVPacientes).importarPacientes()
         );
         rutaPacientes = CSVPacientes;
         rutaPlantilla = CSVPlantilla;
+    }
+
+    public void cargarCitas(String CSVCItas) {
+        citas = new CitasCSV(CSVCItas).importarCitas(listaPacientes, plantilla);
+    }
+
+    public void cargarHistoriales(String carpetaHistoriales) throws InvalidAttributeValueException {
+        //Crear historiales
+        for(Paciente p : listaPacientes.getPacientes()){
+            Paths.get(carpetaHistoriales+"/"+p.getCIPA());
+        }
+
+
+        for (int i = 0; i < listaPacientes.getPacientes().size(); i++) {
+            Paciente p = listaPacientes.getPacientes().get(i);
+            p = new HistorialesCSV(carpetaHistoriales).importarHistorial(p, plantilla);
+            listaPacientes.getPacientes().set(i, p);
+        }
+    }
+
+    public void exportarHistoriales(String carpetaHistoriales) throws InvalidAttributeValueException, IOException {
+        for (Paciente p : listaPacientes.getPacientes()) {
+            new HistorialesCSV(carpetaHistoriales).exportarHistorial(p);
+        }
     }
 
     public Controlador(String CSVPacientes, String CSVPlantilla, String CSVCitas, String CSVHistoriales) {
@@ -221,7 +242,7 @@ public class Controlador {
         return null;
     }
 
-    public int crearUsuario(Usuario u) {
+    public int crearUsuario(Usuario u) throws IOException {
 
         Log.INFO("Nuevo usuario");
 
@@ -261,7 +282,7 @@ public class Controlador {
         return 0;
     }
 
-    public boolean borrarUsuario(long CIPA) {
+    public boolean borrarUsuario(long CIPA) throws IOException {
         Usuario u = null;
         if (!listaPacientes.verificarCIPA(CIPA)) {
             u = listaPacientes.identificarPaciente(CIPA);
@@ -291,7 +312,7 @@ public class Controlador {
                                     String direccion,
                                     long telefono,
                                     Especialidades especialidad,
-                                    Centros centro) {
+                                    Centros centro) throws IOException {
 
         if (u == null) return false;
 

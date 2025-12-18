@@ -58,6 +58,9 @@ public class Consulta {
         this.preescripcion = med;
     }
 
+    public String getRutaInforme() {
+        return rutaInforme;
+    }
 
     @Override
     public String toString() {

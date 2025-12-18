@@ -3,6 +3,7 @@ package CSV;
 import backend.Agendas.Pacientes;
 import backend.Usuarios.Paciente;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class PacientesCSV extends ProcesadorCSV{
@@ -26,7 +27,7 @@ public class PacientesCSV extends ProcesadorCSV{
         return new Pacientes( arrayPacientes );
     }
 
-    public boolean exportarPacientes(Pacientes pacientes){
+    public boolean exportarPacientes(Pacientes pacientes) throws IOException {
         ArrayList<String[]> contenido = new ArrayList<>();
 
         for( Paciente p : pacientes.getPacientes()){

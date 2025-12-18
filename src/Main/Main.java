@@ -6,6 +6,7 @@ import backend.Agendas.AgendaConsultas;
 import Controlador.Controlador;
 import interfaz.MainVentana;
 
+import javax.management.InvalidAttributeValueException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,15 +14,15 @@ import java.nio.file.Paths;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InvalidAttributeValueException {
 
         inicializarSistemaArchivos();
 
         //Inicializacion temporal.
-        AgendaConsultas agendaConsultas = new AgendaConsultas();
-        AgendaCitas citas = new AgendaCitas();
 
-        Controlador c = new Controlador("datos/Plantilla.csv", "datos/Pacientes.csv", agendaConsultas, citas);
+        Controlador c = new Controlador("datos/Plantilla.csv", "datos/Pacientes.csv");
+        c.cargarCitas("datos/Citas.csv");
+        c.cargarHistoriales("datos/Historiales");
 
 
         Log.INFO("Usuarios en el sistema: ");

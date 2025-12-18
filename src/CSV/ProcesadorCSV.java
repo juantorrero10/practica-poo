@@ -31,7 +31,7 @@ public abstract class ProcesadorCSV {
 
     public void setFichero(String Ruta) { fichero = Paths.get(Ruta);}
 
-    public boolean exportarCSV(ArrayList<String[]> valores) {
+    public boolean exportarCSV(ArrayList<String[]> valores, Path fichero) throws IOException {
         if (fichero == null) return false;
 
         List<String> lineas = new ArrayList<>();
@@ -71,6 +71,10 @@ public abstract class ProcesadorCSV {
         }
 
         return contenido;
+    }
+
+    public boolean exportarCSV(ArrayList<String[]> val) throws IOException {
+        return exportarCSV(val, fichero);
     }
 
 
