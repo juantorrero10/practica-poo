@@ -361,6 +361,8 @@ public class Controlador {
 
     }
 
+
+
     public int crearCitaPaciente(
             Especialidades especialidad,
             LocalDateTime fecha
@@ -375,6 +377,11 @@ public class Controlador {
 
         boolean pedirProximaDisponible = fecha.isEqual(LocalDateTime.now());
         Medico med = plantilla.encontrarEspecilistaAleatorio(especialidad);
+
+        if (med == null) {
+            Log.WARN("No hay médicos disponibles para la especialidad: " + especialidad);
+            return 4;
+        }
 
         Cita cita = new Cita(fecha, loginPaciente, med);
 
@@ -409,5 +416,62 @@ public class Controlador {
         Log.INFO("Cita creada correctamente -> \n\t" + cita);
         return 0;
     }
+
+    // Crear Cita
+    public boolean crearCita(
+            Paciente paciente,
+            Medico medico,
+            LocalDateTime fechaHora
+    ) {
+        if (paciente == null || medico == null || fechaHora == null) {
+            Log.ERR("Datos incompletos para crear la cita");
+            return false;
+        }
+
+        // Crear la cita
+        Cita nueva = new Cita(fechaHora, paciente, medico);
+
+        // Comprobar disponibilidad global
+        if (!citas.comprobarDisponibilidad(nueva)) {
+            Log.WARN("El médico no está disponible en esa fecha/hora");
+            return false;
+        }
+
+        // Añadir a la agenda del médico (comprueba límite diario)
+        if (!medico.anadirCita(nueva)) {
+            Log.WARN("El médico ha alcanzado el máximo de citas diarias");
+            return false;
+        }
+
+        // Añadir a la agenda del paciente
+        if (!paciente.solicitarCitaMedico(nueva)) {
+            Log.WARN("No se pudo asignar la cita al paciente");
+            return false;
+        }
+
+        // Añadir a la agenda global
+        if (!citas.agregarCita(nueva, 20)) {
+            Log.WARN("No se pudo añadir la cita a la agenda global");
+            return false;
+        }
+
+        Log.INFO("Cita creada correctamente -> " + nueva);
+        return true;
+    }
+    public Plantilla getPlantilla() {
+        return plantilla;
+    }
+
+    public Pacientes getListaPacientes() {
+        return listaPacientes;
+    }
+
+    // Crear metodo exportar historial paciente
+    public void cargarHistorialPaciente(Paciente p) throws InvalidAttributeValueException {
+        if (p == null) return;
+
+        new HistorialesCSV(carpetaHistoriales).importarHistorial(p, plantilla);
+    }
+
 
 }

@@ -123,6 +123,10 @@ public class HistorialesCSV extends ProcesadorCSV {
         Historial historial = new Historial();
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern("dd-MM-yyyy:HH:mm");
+        if (contenido == null) {
+            p.setHistorial(historial);
+            return p;
+        }
 
         for (String[] fila : contenido) {
             switch (ElementoHistorial.valueOf(fila[0])) {

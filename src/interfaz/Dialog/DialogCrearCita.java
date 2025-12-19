@@ -58,8 +58,10 @@ public class DialogCrearCita extends JDialog {
         labelError.setPreferredSize(new Dimension(300, 15));
         labelFecha = new JLabel("Fecha:");
         labelFecha.setFont(labelError.getFont().deriveFont(Font.BOLD, 14f));
-        labelFecha = new JLabel("Hora:");
-        labelFecha.setFont(labelError.getFont().deriveFont(Font.BOLD, 14f));
+
+        labelHora = new JLabel("Hora:");   // CORRECTO
+        labelHora.setFont(labelError.getFont().deriveFont(Font.BOLD, 14f));
+
         labelEspecialidad = new JLabel("Especialidad:");
         labelEspecialidad.setFont(labelError.getFont().deriveFont(Font.BOLD, 14f));
         labelAclaracion = new JLabel("Si se dejan en blanco se asignará una automática");
@@ -133,7 +135,7 @@ public class DialogCrearCita extends JDialog {
                 break;
             case 4:
             default:
-                setLabelError("No se ha podido asignar la cita", Color.RED);
+                setLabelError("No hay medicos disponibles", Color.RED);
                 break;
         }
 
