@@ -35,7 +35,7 @@ public class CitasCSV extends ProcesadorCSV {
     public AgendaCitas importarCitas(Pacientes p, Plantilla pl) {
         ArrayList<String[]> contenido = importarCSV();
         ArrayList<Cita> arrayCitas = new ArrayList<>();
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("DD-MM-YYYY:HH:MM");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy:HH:mm");
 
         for (String[] fila : contenido) {
             Cita c = new Cita(

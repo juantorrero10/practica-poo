@@ -16,10 +16,11 @@ public class PanelPaciente extends Panel {
 
     public PanelPaciente(Controlador c) {
         super("Paciente", c);
-        crearBarraUsuario(TipoUsuario.PACIENTE);
+        add(crearBarraUsuario(TipoUsuario.PACIENTE), BorderLayout.NORTH);
         hasBarraSuperior = true;
 
         panelCentral = new JPanel(new BorderLayout());
+        panelCentral.add(new PanelPacienteHistorial(controlador.getLoginPaciente(), controlador), BorderLayout.CENTER);
         add(panelCentral, BorderLayout.CENTER);
 
         crearBotonera();
@@ -27,14 +28,14 @@ public class PanelPaciente extends Panel {
 
     private void crearBotonera() {
         JButton botonCrearCita = new JButton("Crear cita");
-        JButton botonHistorial = new JButton("Historial");
+        //JButton botonHistorial = new JButton("Historial");
 
         botonCrearCita.addActionListener(e -> abrirCrearCita());
-        botonHistorial.addActionListener(e -> toggleHistorial());
+        //botonHistorial.addActionListener(e -> toggleHistorial());
 
         JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.CENTER));
         panelSur.add(botonCrearCita);
-        panelSur.add(botonHistorial);
+        //panelSur.add(botonHistorial);
 
         add(panelSur, BorderLayout.SOUTH);
     }
@@ -70,7 +71,7 @@ public class PanelPaciente extends Panel {
         panelCentral.removeAll();
 
         if (!historialVisible) {
-            panelCentral.add(new PanelPacienteHistorial(p), BorderLayout.CENTER);
+            panelCentral.add(new PanelPacienteHistorial(p, controlador), BorderLayout.CENTER);
         }
 
         historialVisible = !historialVisible;

@@ -1,5 +1,6 @@
 package backend.Agendas;
 
+import Main.Log;
 import backend.Citas.Cita;
 import backend.Enumeradores.Centros;
 import backend.Usuarios.Medico;
@@ -153,5 +154,23 @@ public class AgendaCitas {
             n++;
         }
         return s;
+    }
+
+
+    public int anularCita(Cita c, String mot) {
+        int n = 0;
+        if (!citas.contains(c)) {
+            Log.WARN("Se ha intentado cancelar una cita que no existe.");
+            return 1;
+        }
+        else if (c.isAnulada()) {
+            Log.WARN("La cita ya esta cancelada.");
+            return 2;
+        }
+
+        n = citas.indexOf(c);
+        c.cancelar(mot);
+        citas.set(n, c);
+        return 0;
     }
 }

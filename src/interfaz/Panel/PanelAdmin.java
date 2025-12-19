@@ -11,7 +11,7 @@ public class PanelAdmin extends Panel {
     public PanelAdmin(Controlador c) {
 
         super("Administrador", c);
-        crearBarraUsuario(TipoUsuario.ADMIN);
+        add(crearBarraUsuario(TipoUsuario.ADMIN), BorderLayout.NORTH);
         hasBarraSuperior = true;
 
         JPanel contenido = new JPanel(new BorderLayout());

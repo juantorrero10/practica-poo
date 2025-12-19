@@ -14,7 +14,6 @@ import CSV.*;
 import javax.management.InvalidAttributeValueException;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,7 +38,8 @@ public class Controlador {
     private String carpetaHistoriales = "";
 
     // Oyentes
-    private List<OyenteSesion> oyentes;
+    private List<OyenteSesion> oyentesSesion;
+    private List<OyenteCitas> oyentesCitas;
 
     public Controlador(Plantilla p, Pacientes pa) {
         this.plantilla = p;
@@ -50,7 +50,8 @@ public class Controlador {
         loginAdmin = null;
         loginAdminC = null;
 
-        oyentes = new ArrayList<>();
+        oyentesSesion = new ArrayList<>();
+        oyentesCitas = new ArrayList<>();
     }
 
     public Controlador() {
@@ -107,14 +108,22 @@ public class Controlador {
     }
 
     public void notificarCambioSesion(Usuario usuario, TipoUsuario tipoUsuario, boolean cambiarPest) {
-        for (OyenteSesion oyente : oyentes) {
+        for (OyenteSesion oyente : oyentesSesion) {
             oyente.onSesionUpdate(usuario, tipoUsuario, cambiarPest);
         }
     }
-
-    public void addOyente(OyenteSesion l) {
-        oyentes.add(l);
+    public void notificarCambioCitas(Cita c) {
+        for (OyenteCitas oyente : oyentesCitas) {
+            oyente.onCitaUpdate(c);
+        }
     }
+
+
+    public void addOyenteSesion(OyenteSesion l) {
+        oyentesSesion.add(l);
+    }
+
+    public void addOyenteCitas(OyenteCitas l) { oyentesCitas.add(l); }
 
 
 
@@ -363,12 +372,16 @@ public class Controlador {
 
 
 
-    public int crearCitaPaciente(
+    public int crearCita(
+            Paciente p,
+            Medico med,
             Especialidades especialidad,
             LocalDateTime fecha
 
     ) {
         Log.INFO("crearCita -> esp: " + especialidad);
+
+        if (p == null) p = loginPaciente;
 
         if (especialidad == Especialidades.NO_ESPECIFICADO) {
             Log.ERR("Especialidad no válido.");
@@ -376,20 +389,28 @@ public class Controlador {
         }
 
         boolean pedirProximaDisponible = fecha.isEqual(LocalDateTime.now());
-        Medico med = plantilla.encontrarEspecilistaAleatorio(especialidad);
+        if (med == null) med = plantilla.encontrarEspecilistaAleatorio(especialidad);
 
         if (med == null) {
             Log.WARN("No hay médicos disponibles para la especialidad: " + especialidad);
             return 4;
         }
 
-        Cita cita = new Cita(fecha, loginPaciente, med);
+        Cita cita = new Cita(fecha, p, med);
 
 
         // Comprobar disponibilidad global
         if (!pedirProximaDisponible && !med.getAgenda().comprobarDisponibilidad(cita)) {
             Log.WARN("El médico no está disponible en esa fecha/hora");
             return 2;
+        }
+
+        if (!pedirProximaDisponible) {
+            for (Cita c : citas.getCitas()) {
+                if (c.getPaciente() == p && c.getFechaHora() == fecha) {
+                    Log.WARN("Ya tienes una cita a esa hora.");
+                }
+            }
         }
 
         if (pedirProximaDisponible) {
@@ -413,51 +434,24 @@ public class Controlador {
             return 4;
         }
 
+        p.getArrayCitas().add(cita);
+
         Log.INFO("Cita creada correctamente -> \n\t" + cita);
+
+        notificarCambioCitas(cita);
+
         return 0;
     }
 
-    // Crear Cita
-    public boolean crearCita(
-            Paciente paciente,
-            Medico medico,
-            LocalDateTime fechaHora
-    ) {
-        if (paciente == null || medico == null || fechaHora == null) {
-            Log.ERR("Datos incompletos para crear la cita");
-            return false;
-        }
-
-        // Crear la cita
-        Cita nueva = new Cita(fechaHora, paciente, medico);
-
-        // Comprobar disponibilidad global
-        if (!citas.comprobarDisponibilidad(nueva)) {
-            Log.WARN("El médico no está disponible en esa fecha/hora");
-            return false;
-        }
-
-        // Añadir a la agenda del médico (comprueba límite diario)
-        if (!medico.anadirCita(nueva)) {
-            Log.WARN("El médico ha alcanzado el máximo de citas diarias");
-            return false;
-        }
-
-        // Añadir a la agenda del paciente
-        if (!paciente.solicitarCitaMedico(nueva)) {
-            Log.WARN("No se pudo asignar la cita al paciente");
-            return false;
-        }
-
-        // Añadir a la agenda global
-        if (!citas.agregarCita(nueva, 20)) {
-            Log.WARN("No se pudo añadir la cita a la agenda global");
-            return false;
-        }
-
-        Log.INFO("Cita creada correctamente -> " + nueva);
-        return true;
+    public int crearCitaPaciente(Especialidades esp, LocalDateTime fh) {
+        return crearCita(null, null, esp, fh);
     }
+
+    public int crearCitaMedico(Paciente p, Especialidades esp, LocalDateTime fh) {
+        return crearCita(p, loginMedico, esp, fh);
+    }
+
+
     public Plantilla getPlantilla() {
         return plantilla;
     }
@@ -473,5 +467,19 @@ public class Controlador {
         new HistorialesCSV(carpetaHistoriales).importarHistorial(p, plantilla);
     }
 
+    public int anularCita(Cita c, String mot) throws IOException {
+        int ret = 0;
+        ret = citas.anularCita(c, mot);
+        c.cancelar(mot);
+        new CitasCSV(rutaCitas).exportarCitas(citas);
+        notificarCambioCitas(c);
+        return ret;
+    }
 
+    public void exportarCitas() throws IOException {
+        new CitasCSV(rutaCitas).exportarCitas(citas);
+    }
+    public AgendaCitas getCitas() {
+        return citas;
+    }
 }

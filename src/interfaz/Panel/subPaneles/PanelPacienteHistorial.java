@@ -1,25 +1,45 @@
 package interfaz.Panel.subPaneles;
 
-import Controlador.Controlador;
+import Controlador.*;
+import Main.Log;
 import backend.Citas.Cita;
 import backend.GestionHistorial.Consulta;
 import backend.Medicacion.Medicamento;
+import backend.Medicacion.Vacuna;
 import backend.Pruebas.Imagen;
 import backend.Pruebas.Laboratorio;
 import backend.Usuarios.Paciente;
+import interfaz.Dialog.DialogAnularCita;
+import interfaz.Dialog.DialogDetalles;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class PanelPacienteHistorial extends JPanel {
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Observer;
+
+public class PanelPacienteHistorial extends JPanel implements OyenteCitas {
 
     private final Paciente paciente;
 
+    private final Controlador controlador;
 
-    public PanelPacienteHistorial(Paciente paciente) {
+    private JTable tablaConsultas;
+    private JTable tablaPLab;
+
+    private JTable tablaCitas;
+    private DefaultTableModel modeloCitas;
+    private ArrayList<Cita> citasVisibles = new ArrayList<>();
+
+    public PanelPacienteHistorial(Paciente paciente, Controlador controlador) {
         this.paciente = paciente;
-        inicializar();
+        this.controlador = controlador;
+        if (paciente != null) this.controlador.addOyenteCitas(this);
+        if (paciente != null) inicializar();
     }
 
     private void inicializar() {
@@ -38,24 +58,139 @@ public class PanelPacienteHistorial extends JPanel {
     // =================== CITAS ===================
     private JScrollPane panelCitas() {
         String[] cols = {"Fecha", "Hora", "Médico", "Estado"};
-        DefaultTableModel m = new DefaultTableModel(cols, 0);
 
-        for (Cita c : paciente.getArrayCitas()) {
-            m.addRow(new Object[]{
-                    c.getFechaHora().toLocalDate(),
-                    c.getFechaHora().toLocalTime(),
-                    c.getMedico().getCIPA(),
-                    c.isAnulada() ? "Anulada" : "Vigente"
-            });
+        modeloCitas = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tablaCitas = new JTable(modeloCitas);
+        tablaCitas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        cargarCitas();
+
+        JPopupMenu menu = crearMenuCitas();
+        tablaCitas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) { mostrarMenu(e); }
+            @Override
+            public void mouseReleased(MouseEvent e) { mostrarMenu(e); }
+
+            private void mostrarMenu(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int fila = tablaCitas.rowAtPoint(e.getPoint());
+                    if (fila >= 0) {
+                        tablaCitas.setRowSelectionInterval(fila, fila);
+                        menu.show(tablaCitas, e.getX(), e.getY());
+                    }
+                }
+            }
+        });
+
+        return new JScrollPane(tablaCitas);
+    }
+
+    private void cargarCitas() {
+        modeloCitas.setRowCount(0);
+        citasVisibles.clear();
+
+        for (Cita c : controlador.getCitas().getCitas()) {
+            if (c.getPaciente().equals(paciente)) {
+                citasVisibles.add(c);
+                modeloCitas.addRow(new Object[]{
+                        c.getFechaHora().toLocalDate(),
+                        c.getFechaHora().toLocalTime(),
+                        c.getMedico().getCIPA() + " (" + c.getMedico().getEspecialidad() + ")",
+                        c.isAnulada() ? "Anulada" : "Vigente"
+                });
+            }
         }
+    }
 
-        return new JScrollPane(new JTable(m));
+    private JPopupMenu crearMenuCitas() {
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem itemDetalles = new JMenuItem("Detalles");
+        JMenuItem itemAnular = new JMenuItem("Anular");
+        itemAnular.setForeground(Color.RED);
+
+        itemDetalles.addActionListener(e -> {
+            int fila = tablaCitas.getSelectedRow();
+            if (fila >= 0) verDetalles(citasVisibles.get(fila).toString(), "Detalles de la cita");
+        });
+
+        itemAnular.addActionListener(e -> {
+            int fila = tablaCitas.getSelectedRow();
+            if (fila >= 0) anularCita(citasVisibles.get(fila));
+        });
+
+        menu.add(itemDetalles);
+        menu.add(itemAnular);
+        return menu;
+    }
+
+    private JPopupMenu crearMenuConsultas() {
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem itemDetalles = new JMenuItem("Detalles");
+
+        itemDetalles.addActionListener(e -> {
+            int fila = tablaConsultas.getSelectedRow();
+            if (fila >= 0) verDetalles(paciente.getHistorial().getConsultas().get(fila).toString(), "Detalles de la Consulta");
+        });
+
+
+        menu.add(itemDetalles);
+        return menu;
+    }
+
+    private JPopupMenu crearMenuPLab() {
+        JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem itemDetalles = new JMenuItem("Detalles");
+
+        itemDetalles.addActionListener(e -> {
+            int fila = tablaPLab.getSelectedRow();
+            if (fila >= 0) verDetalles(paciente.getHistorial().getLaboratorio().get(fila).toString(), "Detalles de la prueba");
+        });
+
+
+        menu.add(itemDetalles);
+        return menu;
+    }
+
+
+    private void anularCita(Cita c) {
+        DialogAnularCita da = new DialogAnularCita(
+                SwingUtilities.getWindowAncestor(this),
+                controlador,
+                TipoUsuario.PACIENTE,
+                c
+        );
+        da.setVisible(true);
+    }
+
+    private void verDetalles(String txt, String titulo) {
+        DialogDetalles dd = new DialogDetalles(
+                SwingUtilities.getWindowAncestor(this),
+                txt,
+                titulo
+        );
+        dd.setVisible(true);
     }
 
     // =================== CONSULTAS ===================
     private JScrollPane panelConsultas() {
         String[] cols = {"Fecha", "Motivo", "Tipo", "Centro", "Médico"};
-        DefaultTableModel m = new DefaultTableModel(cols, 0);
+
+        DefaultTableModel m = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
 
         for (Consulta c : paciente.getHistorial().getConsultas()) {
             m.addRow(new Object[]{
@@ -67,7 +202,28 @@ public class PanelPacienteHistorial extends JPanel {
             });
         }
 
-        return new JScrollPane(new JTable(m));
+        tablaConsultas = new JTable(m);
+
+        JPopupMenu menu = crearMenuConsultas();
+        tablaConsultas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) { mostrarMenu(e); }
+            @Override
+            public void mouseReleased(MouseEvent e) { mostrarMenu(e); }
+
+            private void mostrarMenu(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int fila = tablaConsultas.rowAtPoint(e.getPoint());
+                    if (fila >= 0) {
+                        tablaConsultas.setRowSelectionInterval(fila, fila);
+                        menu.show(tablaConsultas, e.getX(), e.getY());
+                    }
+                }
+            }
+        });
+
+
+        return new JScrollPane(tablaConsultas);
     }
 
     // =================== PRUEBAS ===================
@@ -82,7 +238,13 @@ public class PanelPacienteHistorial extends JPanel {
 
     private JScrollPane panelPruebasImagen() {
         String[] cols = {"Fecha", "Centro", "Ruta informe", "Ruta imagen"};
-        DefaultTableModel m = new DefaultTableModel(cols, 0);
+
+        DefaultTableModel m = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
 
         for (Imagen img : paciente.getHistorial().getImagen()) {
             m.addRow(new Object[]{
@@ -93,35 +255,133 @@ public class PanelPacienteHistorial extends JPanel {
             });
         }
 
-        return new JScrollPane(new JTable(m));
+        JTable tabla = new JTable(m);
+
+        // Renderer para columnas de rutas
+        tabla.getColumnModel().getColumn(2).setCellRenderer(new linkArchivo());
+        tabla.getColumnModel().getColumn(3).setCellRenderer(new linkArchivo());
+
+        // Click para abrir archivo
+        activarClickAbrirArchivo(tabla, 2, 3);
+
+        return new JScrollPane(tabla);
     }
 
+
     private JScrollPane panelPruebasLaboratorio() {
-        String[] cols = {"Fecha", "Centro", "Ruta informe", "Informe"};
-        DefaultTableModel m = new DefaultTableModel(cols, 0);
+        String[] cols = {"Fecha", "Centro", "Ruta informe", "Descripcion"};
+
+        DefaultTableModel m = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
 
         for (Laboratorio lab : paciente.getHistorial().getLaboratorio()) {
             m.addRow(new Object[]{
                     lab.getFecha(),
                     lab.getCentro(),
                     lab.getRutaInforme(),
-                    lab.toString()
+                    lab.getInforme()
             });
         }
 
-        return new JScrollPane(new JTable(m));
+        tablaPLab = new JTable(m);
+
+        tablaPLab.getColumnModel().getColumn(2).setCellRenderer(new linkArchivo());
+        activarClickAbrirArchivo(tablaPLab, 2);
+
+        JPopupMenu menu = crearMenuPLab();
+        tablaPLab.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) { mostrarMenu(e); }
+            @Override
+            public void mouseReleased(MouseEvent e) { mostrarMenu(e); }
+
+            private void mostrarMenu(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int fila = tablaPLab.rowAtPoint(e.getPoint());
+                    if (fila >= 0) {
+                        tablaPLab.setRowSelectionInterval(fila, fila);
+                        menu.show(tablaPLab, e.getX(), e.getY());
+                    }
+                }
+            }
+        });
+
+        return new JScrollPane(tablaPLab);
     }
+
 
     // =================== MEDICACIÓN ===================
     private JScrollPane panelMedicacion() {
-        String[] cols = {"Medicamento"};
-        DefaultTableModel m = new DefaultTableModel(cols, 0);
+        String[] cols = {"Tipo", "Nombre", "Momentaniedad", "Dosis", "Fecha inicio", "Fecha fin", "Fecha siguiente"};
 
-        for (Medicamento med : paciente.getHistorial().getMedicamentosActivos()) {
-            m.addRow(new Object[]{med.toString()});
+        DefaultTableModel m = new DefaultTableModel(cols, 0) {
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
+        };
+
+        for (Medicamento med : paciente.getHistorial().getMedicamentos()) {
+            m.addRow(new Object[]{
+                    (med instanceof Vacuna) ? "Vacuna" : "Medicamento",
+                    med.getNombre(),
+                    med.getTipoPreescripcion(),
+                    med.getDosis() + " mg / " + med.getFrecuencia() + " veces día",
+                    med.getFechaInicio(),
+                    med.getFechaFin(),
+                    (med instanceof Vacuna)? ((Vacuna)med).getFechaSgteDosis() : "--"
+            });
         }
 
-        return new JScrollPane(new JTable(m));
+        JTable tabla = new JTable(m);
+        return new JScrollPane(tabla);
     }
+
+
+    private void activarClickAbrirArchivo(JTable tabla, int... columnas) {
+        tabla.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 1 && SwingUtilities.isLeftMouseButton(e)) {
+                    int fila = tabla.rowAtPoint(e.getPoint());
+                    int col = tabla.columnAtPoint(e.getPoint());
+
+                    for (int c : columnas) {
+                        if (col == c) {
+                            Object val = tabla.getValueAt(fila, col);
+                            if (val instanceof String ruta) {
+                                File f = new File(ruta);
+                                if (f.exists()) {
+                                    try {
+                                        Desktop.getDesktop().open(f);
+                                    } catch (Exception ex) {
+                                        JOptionPane.showMessageDialog(
+                                                tabla,
+                                                "No se pudo abrir el archivo",
+                                                "Error",
+                                                JOptionPane.ERROR_MESSAGE
+                                        );
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+
+    @Override
+    public void onCitaUpdate(Cita c) {
+        Log.INFO("Cita Update -> " + c);
+
+        SwingUtilities.invokeLater(this::cargarCitas);
+    }
+
 }
 

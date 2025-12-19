@@ -1,11 +1,14 @@
 package interfaz.Dialog;
 
+import CSV.CitasCSV;
 import Controlador.*;
 import backend.Enumeradores.Especialidades;
+import backend.Usuarios.Paciente;
 import backend.Usuarios.Usuario;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -16,8 +19,7 @@ public class DialogCrearCita extends JDialog {
     private TipoUsuario tipoUsuario;
     private Usuario usuario;
 
-    private JLabel labelEspecialidad;
-    private JComboBox<Especialidades> comboEspecialidad;
+    // Campos comunes
     private JLabel labelFecha;
     private JLabel labelHora;
     private JTextField campoFecha;
@@ -26,60 +28,77 @@ public class DialogCrearCita extends JDialog {
     private JButton botonCrear;
     private JLabel labelError;
 
+    // Campos específicos
+    private JLabel labelEspecialidad;
+    private JComboBox<Especialidades> comboEspecialidad;
+
+    private JLabel labelPaciente;
+    private JComboBox<Paciente> comboPaciente;
+
     public DialogCrearCita(Window owner, Usuario u, Controlador c) {
-        super(owner, "Opciones de usuario", ModalityType.APPLICATION_MODAL);
+        super(owner, "Crear Cita", ModalityType.APPLICATION_MODAL);
 
         this.usuario = u;
         this.controlador = c;
         this.tipoUsuario = u.getTipoUsuario();
 
-        int width = 500;
-
-
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setSize(width, 350);
+        setSize(500, 350);
         setLocationRelativeTo(owner);
 
-
-        inicizializarComponentes();
+        inicializarComponentes();
         layoutComponentes();
         registrarEventos();
     }
 
-    public void inicizializarComponentes() {
-        comboEspecialidad = new JComboBox<>(Especialidades.values());
+    private void inicializarComponentes() {
         campoFecha = new JTextField("YYYY-MM-DD", 10);
         campoHora = new JTextField("HH:MM", 5);
         botonCrear = new JButton("Crear");
-        labelError = new JLabel();
-        labelError.setHorizontalAlignment(SwingConstants.CENTER);
+        labelError = new JLabel("", SwingConstants.CENTER);
         labelError.setForeground(Color.RED);
         labelError.setFont(labelError.getFont().deriveFont(Font.PLAIN, 11f));
         labelError.setPreferredSize(new Dimension(300, 15));
+
         labelFecha = new JLabel("Fecha:");
         labelFecha.setFont(labelError.getFont().deriveFont(Font.BOLD, 14f));
 
-        labelHora = new JLabel("Hora:");   // CORRECTO
+        labelHora = new JLabel("Hora:");
         labelHora.setFont(labelError.getFont().deriveFont(Font.BOLD, 14f));
 
-        labelEspecialidad = new JLabel("Especialidad:");
-        labelEspecialidad.setFont(labelError.getFont().deriveFont(Font.BOLD, 14f));
         labelAclaracion = new JLabel("Si se dejan en blanco se asignará una automática");
         labelAclaracion.setHorizontalAlignment(SwingConstants.CENTER);
         labelAclaracion.setFont(labelError.getFont().deriveFont(Font.PLAIN, 12f));
+
+        if (tipoUsuario == TipoUsuario.PACIENTE) {
+            labelEspecialidad = new JLabel("Especialidad:");
+            labelEspecialidad.setFont(labelError.getFont().deriveFont(Font.BOLD, 14f));
+            comboEspecialidad = new JComboBox<>(Especialidades.values());
+        } else if (tipoUsuario == TipoUsuario.MEDICO) {
+            labelPaciente = new JLabel("Paciente:");
+            labelPaciente.setFont(labelError.getFont().deriveFont(Font.BOLD, 14f));
+            comboPaciente = new JComboBox<>(
+                    controlador.getListaPacientes().getPacientes().toArray(new Paciente[0])
+            );
+        }
     }
 
-    public void layoutComponentes() {
+    private void layoutComponentes() {
         setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.VERTICAL;
         c.insets = new Insets(5, 8, 7, 8);
-        c.gridy = 0;
         c.gridx = 0;
+        c.gridy = 0;
         c.anchor = GridBagConstraints.NORTH;
 
-        add(labelEspecialidad, c); c.gridy++;
-        add(comboEspecialidad, c); c.gridy++;
+        if (tipoUsuario == TipoUsuario.PACIENTE) {
+            add(labelEspecialidad, c); c.gridy++;
+            add(comboEspecialidad, c); c.gridy++;
+        } else if (tipoUsuario == TipoUsuario.MEDICO) {
+            add(labelPaciente, c); c.gridy++;
+            add(comboPaciente, c); c.gridy++;
+        }
+
         add(labelFecha, c); c.gridy++;
         add(campoFecha, c); c.gridy++;
         add(labelHora, c); c.gridy++;
@@ -95,18 +114,23 @@ public class DialogCrearCita extends JDialog {
     }
 
     private void registrarEventos() {
-        botonCrear.addActionListener(e -> crearCita());
+        botonCrear.addActionListener(e -> {
+            try {
+                crearCita();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
     }
 
-    private void crearCita() {
+    private void crearCita() throws IOException {
         setLabelError("", Color.RED);
-        Especialidades especialidad = (Especialidades) comboEspecialidad.getSelectedItem();
 
         LocalDate fecha;
         LocalTime hora;
-
         try {
-            if (campoFecha.getText().isEmpty() || campoHora.getText().isEmpty()) {
+            if (campoFecha.getText().isEmpty() || campoHora.getText().isEmpty() ||
+                    (campoFecha.getText()).equals("YYYY-MM-DD") && campoHora.getText().equals("HH:MM")) {
                 fecha = LocalDate.now();
                 hora = LocalTime.now();
             } else {
@@ -120,27 +144,29 @@ public class DialogCrearCita extends JDialog {
 
         LocalDateTime fh = LocalDateTime.of(fecha, hora);
 
-        switch (controlador.crearCitaPaciente(especialidad, fh)) {
-            case 0:
-                setLabelError("Cita creada", Color.GREEN);
-                break;
-            case 1:
-                setLabelError("Especialidad incorrecta", Color.RED);
-                break;
-            case 2:
-                setLabelError("La fecha y hora no estan disponibles", Color.RED);
-                break;
-            case 3:
-                setLabelError("El médico ha alcanzado el máximo de citas", Color.RED);
-                break;
-            case 4:
-            default:
-                setLabelError("No hay medicos disponibles", Color.RED);
-                break;
+        if (tipoUsuario == TipoUsuario.PACIENTE) {
+            Especialidades especialidad = (Especialidades) comboEspecialidad.getSelectedItem();
+            int res = controlador.crearCitaPaciente(especialidad, fh);
+            mostrarResultado(res);
+        } else if (tipoUsuario == TipoUsuario.MEDICO) {
+            Especialidades especialidad = controlador.getLoginMedico().getEspecialidad();
+            Paciente paciente = (Paciente) comboPaciente.getSelectedItem();
+            int res = controlador.crearCitaMedico(paciente, especialidad, fh);
+            mostrarResultado(res);
         }
 
-
+        controlador.exportarCitas();
     }
 
-
+    private void mostrarResultado(int res) {
+        switch (res) {
+            case 0: setLabelError("Cita creada", Color.GREEN); break;
+            case 1: setLabelError("Especialidad incorrecta", Color.RED); break;
+            case 2: setLabelError("La fecha y hora no están disponibles", Color.RED); break;
+            case 3: setLabelError("El médico ha alcanzado el máximo de citas", Color.RED); break;
+            case 4:
+            default: setLabelError("No hay médicos disponibles", Color.RED); break;
+        }
+    }
 }
+

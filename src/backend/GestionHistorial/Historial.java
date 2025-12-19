@@ -38,6 +38,17 @@ public class Historial {
         return ret;
     }
 
+    public List<Medicamento> getMedicamentos() {
+        ArrayList<Medicamento> ret = new ArrayList<>();
+        for (Consulta c : consultas) {
+            if (c.getPreescripcion() != null) {
+                ret.add(c.getPreescripcion());
+            }
+        }
+
+        return ret;
+    }
+
     public String consultasToString() {
         return AgendaConsultas.arrayConsultasToString(consultas);
     }

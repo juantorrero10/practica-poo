@@ -4,7 +4,6 @@ import Controlador.Controlador;
 import Controlador.OyenteSesion;
 import Controlador.TipoUsuario;
 import Main.Log;
-import backend.Usuarios.Paciente;
 import backend.Usuarios.Usuario;
 import interfaz.Panel.*;
 
@@ -26,78 +25,113 @@ public class MainVentana extends JFrame implements OyenteSesion {
     private PanelCentro pCentro;
     private PanelPaciente pPaciente;
 
+    private final Controlador controlador;
+
     public MainVentana(Controlador controlador) {
+        this.controlador = controlador;
+
         setTitle("Sistema de Citas Médicas");
         setSize(900, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        pAutentificar = new PanelAutentificar(controlador);
-        pAdmin = new PanelAdmin(controlador);
-        pMedico = new PanelMedico(controlador);
-        pCentro = new PanelCentro(controlador);
-        pPaciente = new PanelPaciente(controlador);
-
-
-        //Añadir oyente para las pestañas
-        controlador.addOyente(this);
+        controlador.addOyenteSesion(this);
 
         tabs = new JTabbedPane();
 
+        // 1️⃣ Crear TODAS las pestañas primero
+        pAutentificar = new PanelAutentificar(controlador);
         tabAutentificar = tabs.getTabCount();
         tabs.add("Autentificar", pAutentificar);
 
         tabPaciente = tabs.getTabCount();
-        tabs.addTab("Paciente", pPaciente);
+        tabs.add("Paciente", new JPanel());
 
         tabMedico = tabs.getTabCount();
-        tabs.addTab("Médico", pMedico);
+        tabs.add("Médico", new JPanel());
 
         tabAdminCentro = tabs.getTabCount();
-        tabs.addTab("Gestión Centro", pCentro);
+        tabs.add("Gestión Centro", new JPanel());
 
         tabAdmin = tabs.getTabCount();
-        tabs.addTab("Admin", pAdmin);
+        tabs.add("Admin", new JPanel());
 
         add(tabs);
 
-        //Desabilitar todas
+        // 2️⃣ Deshabilitar todas menos autentificar
         for (int i = 0; i < tabs.getTabCount(); i++) {
-            tabs.setEnabledAt( i, false);
+            tabs.setEnabledAt(i, false);
         }
-        tabs.setEnabledAt(tabAutentificar,true);
+        tabs.setEnabledAt(tabAutentificar, true);
         tabs.setSelectedIndex(tabAutentificar);
-
     }
 
 
+    // ==================================================
+    // CREACIÓN DE PANELES
+    // ==================================================
+    private void crearPanelAutentificar() {
+        pAutentificar = new PanelAutentificar(controlador);
+        tabs.setComponentAt(tabAutentificar, pAutentificar);
+    }
+
+    private void crearPanelPaciente() {
+        pPaciente = new PanelPaciente(controlador);
+        tabs.setComponentAt(tabPaciente, pPaciente);
+    }
+
+    private void crearPanelMedico() {
+        pMedico = new PanelMedico(controlador);
+        tabs.setComponentAt(tabMedico, pMedico);
+    }
+
+    private void crearPanelAdminCentro() {
+        pCentro = new PanelCentro(controlador);
+        tabs.setComponentAt(tabAdminCentro, pCentro);
+    }
+
+    private void crearPanelAdmin() {
+        pAdmin = new PanelAdmin(controlador);
+        tabs.setComponentAt(tabAdmin, pAdmin);
+    }
+
+    // ==================================================
+    // OYENTE DE SESIÓN
+    // ==================================================
     @Override
     public void onSesionUpdate(Usuario usuario, TipoUsuario tipoUsuario, boolean cambiarPest) {
-        boolean flag = usuario != null;
-        Log.INFO("SessionUpdate -> flag: " + flag + ", type: " + tipoUsuario);
+        boolean activo = usuario != null;
+        Log.INFO("SessionUpdate -> activo=" + activo + ", tipo=" + tipoUsuario);
 
-        switch(tipoUsuario) {
-            case TipoUsuario.PACIENTE:
-                tabs.setEnabledAt(tabPaciente, flag);
-                if (cambiarPest)tabs.setSelectedIndex(!flag ? tabAutentificar : tabPaciente);
-                pPaciente.actualizarLabelUsuario(usuario);
-                break;
-            case TipoUsuario.ADMIN:
-                tabs.setEnabledAt(tabAdmin, flag);
-                if (cambiarPest)tabs.setSelectedIndex(!flag ? tabAutentificar : tabAdmin);
-                pAdmin.actualizarLabelUsuario(usuario);
-                break;
-            case TipoUsuario.ADMINCENTRO:
-                tabs.setEnabledAt(tabAdminCentro, flag);
-                if (cambiarPest)tabs.setSelectedIndex(!flag ? tabAutentificar : tabAdminCentro);
-                pCentro.actualizarLabelUsuario(usuario);
-                break;
-            case TipoUsuario.MEDICO:
-                tabs.setEnabledAt(tabMedico, flag);
-                if (cambiarPest)tabs.setSelectedIndex(!flag ? tabAutentificar : tabMedico);
-                pMedico.actualizarLabelUsuario(usuario);
-                break;
+        switch (tipoUsuario) {
 
+            case PACIENTE -> {
+                if (activo) crearPanelPaciente();
+                tabs.setEnabledAt(tabPaciente, activo);
+                if (activo) pPaciente.actualizarLabelUsuario(usuario);
+                if (cambiarPest) tabs.setSelectedIndex(activo ? tabPaciente : tabAutentificar);
+            }
+
+            case MEDICO -> {
+                if (activo) crearPanelMedico();
+                tabs.setEnabledAt(tabMedico, activo);
+                if (activo) pMedico.actualizarLabelUsuario(usuario);
+                if (cambiarPest) tabs.setSelectedIndex(activo ? tabMedico : tabAutentificar);
+            }
+
+            case ADMINCENTRO -> {
+                if (activo) crearPanelAdminCentro();
+                tabs.setEnabledAt(tabAdminCentro, activo);
+                if (activo) pCentro.actualizarLabelUsuario(usuario);
+                if (cambiarPest) tabs.setSelectedIndex(activo ? tabAdminCentro : tabAutentificar);
+            }
+
+            case ADMIN -> {
+                if (activo) crearPanelAdmin();
+                tabs.setEnabledAt(tabAdmin, activo);
+                if (activo) pAdmin.actualizarLabelUsuario(usuario);
+                if (cambiarPest) tabs.setSelectedIndex(activo ? tabAdmin : tabAutentificar);
+            }
         }
     }
 }

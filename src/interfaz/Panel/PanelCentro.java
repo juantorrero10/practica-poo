@@ -11,7 +11,7 @@ public class PanelCentro extends Panel {
     public PanelCentro(Controlador c) {
         super("Gestión Centro", c);
 
-        crearBarraUsuario(TipoUsuario.ADMINCENTRO);
+        add(crearBarraUsuario(TipoUsuario.ADMINCENTRO), BorderLayout.NORTH);
         hasBarraSuperior = true;
 
 

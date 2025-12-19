@@ -13,19 +13,18 @@ public abstract class Panel extends JPanel {
 
     protected Controlador controlador;
 
-    // ----  Elementos comunes ---
-
-    //Barra superior
+    // ---- Elementos comunes ----
     protected boolean hasBarraSuperior = false;
-    private JLabel labelUsuario = null;
-    private JButton botonCerrarSesion = null;
+
+    protected JLabel labelUsuario = null;
+    protected JButton botonCerrarSesion = null;
 
     public Panel(String NombrePanel, Controlador controlador) {
         setLayout(new BorderLayout());
         this.controlador = controlador;
     }
 
-    protected void crearBarraUsuario(TipoUsuario tp) {
+    protected JPanel crearBarraUsuario(TipoUsuario tp) {
         JPanel barra = new JPanel(new BorderLayout());
         barra.setBorder(
                 BorderFactory.createCompoundBorder(
@@ -39,7 +38,6 @@ public abstract class Panel extends JPanel {
         // ---- IZQUIERDA (info usuario) ----
         labelUsuario = new JLabel();
         labelUsuario.setFont(labelUsuario.getFont().deriveFont(Font.PLAIN, 13f));
-
         barra.add(labelUsuario, BorderLayout.WEST);
 
         // ---- DERECHA (opciones + cerrar sesión) ----
@@ -47,7 +45,6 @@ public abstract class Panel extends JPanel {
 
         JButton botonOpciones = new JButton("Opciones");
         botonOpciones.setFocusPainted(false);
-
         botonOpciones.addActionListener(e -> abrirDialogoOpciones(tp));
 
         botonCerrarSesion = new JButton("Cerrar sesión");
@@ -57,21 +54,20 @@ public abstract class Panel extends JPanel {
                 BorderFactory.createLineBorder(Color.RED, 1)
         );
 
-        botonCerrarSesion.addActionListener(e -> controlador.cerrarSesion(tp));
+        botonCerrarSesion.addActionListener(e -> {
+            limpiarPanel();                 // 🔴 CLAVE
+            controlador.cerrarSesion(tp);   // lógica de sesión
+        });
 
         derecha.add(botonOpciones);
         derecha.add(botonCerrarSesion);
 
         barra.add(derecha, BorderLayout.EAST);
-
-        add(barra, BorderLayout.NORTH);
+        return barra;
     }
 
-
     public void actualizarLabelUsuario(Usuario u) {
-        Paciente pac;
-
-        if (!hasBarraSuperior) { return; }
+        if (!hasBarraSuperior || labelUsuario == null) return;
 
         if (u == null) {
             labelUsuario.setText("");
@@ -82,8 +78,7 @@ public abstract class Panel extends JPanel {
         texto.append("<span style='color:black;'>Usuario → </span>");
         texto.append("<span style='color:#2e7d32;'>");
 
-        if (u instanceof Paciente) {
-            pac = (Paciente) u;
+        if (u instanceof Paciente pac) {
             texto.append(pac.getNombreCompleto()).append(" · ");
         }
 
@@ -105,7 +100,17 @@ public abstract class Panel extends JPanel {
                         controlador
                 );
 
-        dialogo.setVisible(true); // MODAL → bloquea hasta cerrar
+        dialogo.setVisible(true);
     }
 
+
+    protected void limpiarPanel() {
+        removeAll();                // borra TODOS los componentes
+        labelUsuario = null;
+        botonCerrarSesion = null;
+        hasBarraSuperior = false;
+
+        revalidate();               // recalcula layout
+        repaint();                  // repinta
+    }
 }

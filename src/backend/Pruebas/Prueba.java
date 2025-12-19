@@ -24,8 +24,8 @@ public abstract class Prueba {
     @Override
     public String toString() {
         return "Fecha: " + fecha +
-                "Centro:" + centro +
-                "Ruta del Informe: " + rutaInforme + '\'' +
+                "\nCentro:" + centro +
+                "\nRuta del Informe: " + rutaInforme +
                 '\n';
     }
 }

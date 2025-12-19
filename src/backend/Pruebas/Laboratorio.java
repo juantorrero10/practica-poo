@@ -18,8 +18,8 @@ public class Laboratorio extends Prueba {
 
     @Override
     public String toString() {
-        return "Laboratorio " +
-                "informe: " + informe + '\'' +
+        return "Prueba de laboratorio: " +
+                "\nDescipcion: " + informe + '\n' +
                 super.toString();
     }
 }

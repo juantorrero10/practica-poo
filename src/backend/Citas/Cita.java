@@ -104,10 +104,12 @@ public class Cita {
 
     @Override
     public String toString() {
+        String med =medico.getCIPA() + " (" + medico.getEspecialidad() + ")";
+        String pac = paciente.getNombreCompleto() + " (" + paciente.getCIPA() + ")";
         DateTimeFormatter f =DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm ");
-        String s = "Cita:" + fechaHora.format(f) + "\nPaciente: \n" + paciente.toString() + "\nMedico: \n" + medico.toString();
+        String s = "Cita:" + fechaHora.format(f) + "\nPaciente: \n" + pac + "\nMedico: \n" + med;
         s += "\nEstado = "; s += (anulada)? "Anulada\n" : "Vigente\n";
-        if (anulada) s += "Causa Anulacion: " +  causaAnulacion + "Fecha anulacion: \n" + fechaCancelacion.format(f);
+        if (anulada) s += "Causa Anulacion: " +  causaAnulacion + "\nFecha anulacion: \n" + fechaCancelacion.format(f);
         return s;
     }
 }

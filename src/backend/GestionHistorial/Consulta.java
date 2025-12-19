@@ -69,7 +69,7 @@ public class Consulta {
                 "\nTelefonica: " + tipoConsulta +
                 "\nInformeSeguimineto: " + tipoInforme +
                 "\nCentro: " + centro +
-                "\nMedico: " + medico.getCIPA();
+                "\nMedico: " + medico.getCIPA() + " (" + medico.getEspecialidad() + ")";
         if (this.preescripcion != null) {
             s += "\nPreescripcion: " + this.preescripcion.toString();
         }

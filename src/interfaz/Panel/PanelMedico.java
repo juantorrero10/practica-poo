@@ -1,13 +1,25 @@
 package interfaz.Panel;
 
 import Controlador.*;
+import interfaz.Panel.subPaneles.PanelContenidoMedico;
 
-public class PanelMedico extends Panel{
+import javax.swing.*;
+import java.awt.*;
+
+public class PanelMedico extends Panel {
 
     public PanelMedico(Controlador c) {
-
         super("Médico", c);
-        crearBarraUsuario(TipoUsuario.MEDICO);
+
+        setLayout(new BorderLayout());
+
+        // Barra de usuario explícita en NORTH
+        JPanel barraUsuario = crearBarraUsuario(TipoUsuario.MEDICO);
         hasBarraSuperior = true;
+        add(barraUsuario, BorderLayout.NORTH);
+
+        // Contenido principal en CENTER
+        PanelContenidoMedico contenido = new PanelContenidoMedico(c);
+        add(contenido, BorderLayout.CENTER);
     }
 }
