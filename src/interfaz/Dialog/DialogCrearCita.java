@@ -80,6 +80,17 @@ public class DialogCrearCita extends JDialog {
             comboPaciente = new JComboBox<>(
                     controlador.getListaPacientes().getPacientes().toArray(new Paciente[0])
             );
+            comboPaciente.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                              int index, boolean isSelected, boolean cellHasFocus) {
+                    super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (value instanceof Paciente) {
+                        setText(((Paciente) value).shortString());
+                    }
+                    return this;
+                }
+            });
         }
     }
 
@@ -100,9 +111,15 @@ public class DialogCrearCita extends JDialog {
         }
 
         add(labelFecha, c); c.gridy++;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
         add(campoFecha, c); c.gridy++;
+
         add(labelHora, c); c.gridy++;
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 1.0;
         add(campoHora, c); c.gridy++;
+
         add(labelAclaracion, c); c.gridy++;
         add(botonCrear, c); c.gridy++;
         add(labelError, c); c.gridy++;
@@ -131,7 +148,7 @@ public class DialogCrearCita extends JDialog {
         try {
             if (campoFecha.getText().isEmpty() || campoHora.getText().isEmpty() ||
                     (campoFecha.getText()).equals("YYYY-MM-DD") && campoHora.getText().equals("HH:MM")) {
-                fecha = LocalDate.now();
+                fecha = LocalDate.of(1920, 1, 1);
                 hora = LocalTime.now();
             } else {
                 fecha = LocalDate.parse(campoFecha.getText().trim());

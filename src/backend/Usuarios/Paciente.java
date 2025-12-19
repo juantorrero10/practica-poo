@@ -145,6 +145,10 @@ public class Paciente extends Usuario{
         return (this.getDNI().equals(p.getDNI()));
     }
 
+    public String shortString(){
+        return this.nombreCompleto + " (" + this.getCIPA() + ")";
+    }
+
     @Override
     public String toString() {
         return  super.toString() + ", Nombre Completo = " + nombreCompleto + ", direccion = " + direccion + ", telefono = " + telefono  ;

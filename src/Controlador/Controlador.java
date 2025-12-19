@@ -388,7 +388,10 @@ public class Controlador {
             return 1;
         }
 
-        boolean pedirProximaDisponible = fecha.isEqual(LocalDateTime.now());
+        // La fecha 1920-01-01 es usada como indicicador para pedir una automática.
+        boolean pedirProximaDisponible = LocalDate.from(fecha).equals(LocalDate.of(1920, 1, 1));
+
+
         if (med == null) med = plantilla.encontrarEspecilistaAleatorio(especialidad);
 
         if (med == null) {
