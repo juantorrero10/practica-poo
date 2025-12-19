@@ -74,6 +74,7 @@ public class Controlador {
 
     public void cargarCitas(String CSVCItas) {
         citas = new CitasCSV(CSVCItas).importarCitas(listaPacientes, plantilla);
+        rutaCitas = CSVCItas;
     }
 
     public void cargarHistoriales(String carpetaHistoriales) throws InvalidAttributeValueException {
