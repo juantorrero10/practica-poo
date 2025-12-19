@@ -494,24 +494,28 @@ public class Controlador {
     public void finalizarCitaYAgregarConsulta(Cita cita, Consulta consulta) throws IOException {
         if (cita == null || consulta == null) return;
 
-        Paciente p = cita.getPaciente();
+        Paciente p1 = listaPacientes.identificarPaciente(cita.getPaciente().getCIPA());
         Medico m = cita.getMedico();
 
         // 1. Añadir consulta al historial del paciente
-        p.getHistorial().agregarConsulta(consulta);
+        p1.getHistorial().agregarConsulta(consulta);
 
         // 2. Eliminar la cita de:
         // 2.1 Agenda global
-        citas.anularCita(cita, consulta.getMotivo());
+        citas.eliminarCita(cita);
 
         // 2.2 Agenda del médico
-        m.getAgenda().anularCita(cita, consulta.getMotivo());
+        Medico m2 = m;
+        m2.eliminarCita(cita);
+        plantilla.cambiarMedico(m, m2);
 
         // 2.3 Lista de citas del paciente
-        p.getArrayCitas().remove(cita);
+        Paciente p2 = p1;
+        p1.eliminarCita(cita);
+        listaPacientes.cambiarPaciente(p1, p2);
 
         // 3. Persistencia
-        exportarHistorialPaciente(p);
+        exportarHistorialPaciente(p2);
         exportarCitas();
 
         // 4. Notificar cambios
@@ -544,13 +548,29 @@ public class Controlador {
 
         LocalDate fechaInicio;
         LocalDate fechaFin;
+        boolean fi = false;
+        boolean ff = true;
 
-        try {
-            fechaInicio = LocalDate.parse(fechaInicioTxt);
-            fechaFin = LocalDate.parse(fechaFinTxt);
-        } catch (Exception e) {
-            throw new InvalidAttributeValueException("Formato de fecha inválido (YYYY-MM-DD)");
+        if (fechaInicioTxt.isEmpty() || fechaInicioTxt.equals("YYYY-MM-DD")) {
+            fechaInicio = LocalDate.now();
+        } else {
+            try {
+                fechaInicio = LocalDate.parse(fechaInicioTxt);
+            } catch (Exception e) {
+                throw new InvalidAttributeValueException("Formato de fecha de inicio inválido (YYYY-MM-DD)");
+            }
         }
+
+        if (fechaFinTxt.isEmpty() || fechaFinTxt.equals("YYYY-MM-DD")) {
+            fechaFin = LocalDate.now().plusYears(10);
+        } else {
+            try {
+                fechaFin = LocalDate.parse(fechaFinTxt);
+            } catch (Exception e) {
+                throw new InvalidAttributeValueException("Formato de fecha de fin inválido (YYYY-MM-DD)");
+            }
+        }
+
 
         if (fechaFin.isBefore(fechaInicio)) {
             throw new InvalidAttributeValueException("La fecha de fin no puede ser anterior a la de inicio");
@@ -565,7 +585,6 @@ public class Controlador {
                 fechaFin
         );
 
-        // 🔹 Si es vacuna, validar y crear vacuna
         if (esVacuna) {
 
             LocalDate fechaSgte;
@@ -580,6 +599,8 @@ public class Controlador {
 
         return base;
     }
+
+
 
 
 

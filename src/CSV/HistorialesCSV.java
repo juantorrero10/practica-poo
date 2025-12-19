@@ -78,7 +78,7 @@ public class HistorialesCSV extends ProcesadorCSV {
                     c.getFecha().format(dtf),
                     c.getMotivo(),
                     c.getTipoConsulta().toString(),
-                    c.getTipoConsulta().toString(),
+                    c.getTipoInforme().toString(),
                     c.getRutaInforme(),
                     c.getCentro().toString(),
                     ((Long)c.getMedico().getCIPA()).toString(),

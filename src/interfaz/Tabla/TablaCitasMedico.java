@@ -7,6 +7,7 @@ import interfaz.Dialog.DialogAnularCita;
 import interfaz.Dialog.DialogDetalles;
 import interfaz.Dialog.DialogFinalizarConsulta;
 
+import javax.management.InvalidAttributeValueException;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -109,7 +110,11 @@ public class TablaCitasMedico extends JTable implements OyenteCitas {
         anular.setForeground(Color.RED);
 
         fin.addActionListener(e -> {
-            finalizar(getCitaSeleccionada());
+            try {
+                finalizar(getCitaSeleccionada());
+            } catch (InvalidAttributeValueException ex) {
+                throw new RuntimeException(ex);
+            }
         });
 
         det.addActionListener(e -> {
@@ -128,7 +133,7 @@ public class TablaCitasMedico extends JTable implements OyenteCitas {
         return(popupMenu);
     }
 
-    private void finalizar(Cita c) {
+    private void finalizar(Cita c) throws InvalidAttributeValueException {
 
         Log.INFO("fin: " + c);
 

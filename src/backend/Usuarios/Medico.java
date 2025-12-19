@@ -148,6 +148,10 @@ public class Medico extends Usuario{
         return citasMovidas;
     }
 
+    public void eliminarCita(Cita c) {
+        this.agendaCitas.getCitas().remove(c);
+    }
+
     @Override
     public String toString() {
         return super.toString()  + ", especialidad = " + especialidad + ", Centro = " + centro ;

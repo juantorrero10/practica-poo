@@ -173,4 +173,8 @@ public class AgendaCitas {
         citas.set(n, c);
         return 0;
     }
+
+    public void eliminarCita(Cita c) {
+        citas.remove(c);
+    }
 }
