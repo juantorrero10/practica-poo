@@ -5,6 +5,7 @@ import Main.Log;
 import backend.Citas.Cita;
 import interfaz.Dialog.DialogAnularCita;
 import interfaz.Dialog.DialogDetalles;
+import interfaz.Dialog.DialogFinalizarConsulta;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -128,7 +129,20 @@ public class TablaCitasMedico extends JTable implements OyenteCitas {
     }
 
     private void finalizar(Cita c) {
+
         Log.INFO("fin: " + c);
+
+        if (c == null) {
+            return;
+        }
+
+        DialogFinalizarConsulta dfc = new DialogFinalizarConsulta(
+                SwingUtilities.getWindowAncestor(this),
+                controlador,
+                c
+        );
+
+        dfc.setVisible(true);
     }
 
     private void anular(Cita c) {

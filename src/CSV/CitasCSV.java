@@ -38,22 +38,46 @@ public class CitasCSV extends ProcesadorCSV {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy:HH:mm");
 
         for (String[] fila : contenido) {
-            Cita c = new Cita(
-                    LocalDateTime.parse(fila[0], dtf),
-                    p.identificarPaciente(Long.parseLong(fila[1])),
-                    (Medico) pl.getUsuarioCIPA(Long.parseLong(fila[2]))
-            );
-            if (fila[3].equals("true")) {
-                c.cancelar(fila[4]);
-                if (!fila[5].equals("--")) {
-                    c.setFechaCancelacion(LocalDateTime.parse(fila[5], dtf));
+            // Rellenar campos faltantes
+            if (fila.length < 6) {
+                String[] filaNueva = new String[6];
+                for (int i = 0; i < 6; i++) {
+                    filaNueva[i] = (i < fila.length) ? fila[i] : "--";
                 }
+                fila = filaNueva;
             }
-            arrayCitas.add(c);
-        }
-        return new  AgendaCitas(arrayCitas);
 
+            // Saltar filas sin fecha válida
+            if (fila[0].isEmpty() || fila[0].equals("--")) {
+                System.out.println("Fila ignorada por fecha vacía: " + String.join(";", fila));
+                continue;
+            }
+
+            try {
+                Cita c = new Cita(
+                        LocalDateTime.parse(fila[0], dtf),
+                        p.identificarPaciente(Long.parseLong(fila[1])),
+                        (Medico) pl.getUsuarioCIPA(Long.parseLong(fila[2]))
+                );
+
+                if (fila[3].equals("true")) {
+                    c.cancelar(fila[4]);
+                    if (!fila[5].equals("--")) {
+                        c.setFechaCancelacion(LocalDateTime.parse(fila[5], dtf));
+                    }
+                }
+
+                arrayCitas.add(c);
+
+            } catch (Exception e) {
+                System.out.println("Fila ignorada por error de parseo: " + String.join(";", fila));
+            }
+        }
+
+        return new AgendaCitas(arrayCitas);
     }
+
+
 
     public void exportarCitas(AgendaCitas ac) throws IOException {
         ArrayList<String[]> contenido = new ArrayList<>();

@@ -8,6 +8,10 @@ import backend.Agendas.Plantilla;
 import backend.Citas.Cita;
 import backend.Enumeradores.Centros;
 import backend.Enumeradores.Especialidades;
+import backend.Enumeradores.TipoPreescripcion;
+import backend.GestionHistorial.Consulta;
+import backend.Medicacion.Medicamento;
+import backend.Medicacion.Vacuna;
 import backend.Usuarios.*;
 import CSV.*;
 
@@ -485,4 +489,98 @@ public class Controlador {
     public AgendaCitas getCitas() {
         return citas;
     }
+
+
+    public void finalizarCitaYAgregarConsulta(Cita cita, Consulta consulta) throws IOException {
+        if (cita == null || consulta == null) return;
+
+        Paciente p = cita.getPaciente();
+        Medico m = cita.getMedico();
+
+        // 1. Añadir consulta al historial del paciente
+        p.getHistorial().agregarConsulta(consulta);
+
+        // 2. Eliminar la cita de:
+        // 2.1 Agenda global
+        citas.anularCita(cita, consulta.getMotivo());
+
+        // 2.2 Agenda del médico
+        m.getAgenda().anularCita(cita, consulta.getMotivo());
+
+        // 2.3 Lista de citas del paciente
+        p.getArrayCitas().remove(cita);
+
+        // 3. Persistencia
+        exportarHistorialPaciente(p);
+        exportarCitas();
+
+        // 4. Notificar cambios
+        notificarCambioCitas(cita);
+    }
+    public Medicamento crearPrescripcion(
+            boolean esVacuna,
+            String nombre,
+            String dosisTxt,
+            String frecuenciaTxt,
+            TipoPreescripcion tipo,
+            String fechaInicioTxt,
+            String fechaFinTxt,
+            String fechaSgteDosisTxt
+    ) throws InvalidAttributeValueException {
+
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new InvalidAttributeValueException("Nombre del medicamento obligatorio");
+        }
+
+        int dosis;
+        int frecuencia;
+
+        try {
+            dosis = Integer.parseInt(dosisTxt);
+            frecuencia = Integer.parseInt(frecuenciaTxt);
+        } catch (NumberFormatException e) {
+            throw new InvalidAttributeValueException("Dosis y frecuencia deben ser numéricas");
+        }
+
+        LocalDate fechaInicio;
+        LocalDate fechaFin;
+
+        try {
+            fechaInicio = LocalDate.parse(fechaInicioTxt);
+            fechaFin = LocalDate.parse(fechaFinTxt);
+        } catch (Exception e) {
+            throw new InvalidAttributeValueException("Formato de fecha inválido (YYYY-MM-DD)");
+        }
+
+        if (fechaFin.isBefore(fechaInicio)) {
+            throw new InvalidAttributeValueException("La fecha de fin no puede ser anterior a la de inicio");
+        }
+
+        Medicamento base = new Medicamento(
+                nombre.trim(),
+                dosis,
+                frecuencia,
+                tipo,
+                fechaInicio,
+                fechaFin
+        );
+
+        // 🔹 Si es vacuna, validar y crear vacuna
+        if (esVacuna) {
+
+            LocalDate fechaSgte;
+            try {
+                fechaSgte = LocalDate.parse(fechaSgteDosisTxt);
+            } catch (Exception e) {
+                throw new InvalidAttributeValueException("Fecha de siguiente dosis inválida");
+            }
+
+            return new Vacuna(base, fechaSgte);
+        }
+
+        return base;
+    }
+
+
+
 }
