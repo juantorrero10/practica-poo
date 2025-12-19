@@ -1,0 +1,158 @@
+package backend.Agendas;
+
+import backend.Enumeradores.Centros;
+import backend.Enumeradores.Especialidades;
+import backend.Usuarios.Admin;
+import backend.Usuarios.AdminCentroSalud;
+import backend.Usuarios.Medico;
+import backend.Usuarios.Usuario;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class Plantilla {
+    private final ArrayList<Admin> administradores;
+    private final ArrayList<Medico> medicos;
+    private final ArrayList<AdminCentroSalud> administradoresCentroSalud;
+
+    //Generador de números aleatorios para obtener especialista al azar
+    private final Random random;
+
+    public Plantilla() {
+        this(new ArrayList<>(),
+            new ArrayList<>(),
+            new ArrayList<>());
+    }
+
+    public Plantilla(ArrayList<Admin> ad, ArrayList<Medico> med, ArrayList<AdminCentroSalud> adC) {
+        administradores = ad;
+        medicos = med;
+        administradoresCentroSalud = adC;
+
+        random = new Random();
+    }
+
+    public List<Medico> getMedicosCentro(Centros c) {
+        List<Medico> medicosCentro = new ArrayList<>();
+        for (Medico m : this.medicos) {
+            if (m.getCentro() == c) { medicosCentro.add(m); }
+        }
+        return medicosCentro;
+    }
+
+    public List<Medico> getEspecialistas(Especialidades esp){
+        List<Medico> medicos = new ArrayList<>();
+        for (Medico m : this.medicos){
+            if (m.getEspecialidad().equals( esp)) { medicos.add(m); }
+        }
+        return medicos;
+    }
+
+    public List<AdminCentroSalud> getAdministradoresCentroSalud() {
+        return administradoresCentroSalud;
+    }
+
+    public List<Admin> getAdministradores() {
+        return administradores;
+    }
+
+    public List<Medico> getMedicos() {
+        return medicos;
+    }
+
+    public Medico encontrarEspecilistaAleatorio(Especialidades esp){
+
+        List<Medico> listaEsp = getEspecialistas(esp);
+        if (listaEsp.isEmpty()) { return null; }
+        int idx = random.nextInt(listaEsp.size());
+        return listaEsp.get(idx);
+    }
+
+    public boolean verificarCIPA(long CIPA) {
+        Admin a = new Admin(null, CIPA);
+        Medico m = new Medico(null, CIPA, null, null);
+        AdminCentroSalud ac =  new AdminCentroSalud(null, CIPA, null);
+        if (!administradores.contains(a) && !medicos.contains(m) && !administradoresCentroSalud.contains(ac)) {
+            return true;
+        } return false;
+    }
+
+    public void agregarAdministrador(Admin nuevo)  {
+        if(verificarCIPA(nuevo.getCIPA())) administradores.add(nuevo);
+    }
+    public void agregarMedico(Medico nuevo) {
+        if(verificarCIPA(nuevo.getCIPA())) medicos.add(nuevo);
+    }
+    public void agregarAdministradorCentro(AdminCentroSalud nuevo) {
+        if(verificarCIPA(nuevo.getCIPA()))
+            administradoresCentroSalud.add(nuevo);
+    }
+
+    public Usuario getUsuarioCIPA(long CIPA) {
+        for (Admin a : administradores) {
+            if (a.getCIPA() == CIPA) { return a; }
+        } for (Medico m : medicos) {
+            if (m.getCIPA() == CIPA) { return m; }
+        } for (AdminCentroSalud a : administradoresCentroSalud) {
+            if (a.getCIPA() == CIPA) { return a; }
+        }
+        return null;
+    }
+
+    public boolean cambiarAdministrador(Admin a, Admin b) {
+        int idx = administradores.indexOf(a);
+        if (idx != -1) {
+            administradores.set(idx, b); return true;
+        }
+        return false;
+    }
+
+    public boolean cambiarMedico(Medico a, Medico b) {
+        int idx = medicos.indexOf(a);
+        if (idx != -1) {
+            medicos.set(idx, b); return true;
+        }
+        return false;
+    }
+
+    public boolean cambiarAdCentro(AdminCentroSalud a, AdminCentroSalud b) {
+        int idx = administradoresCentroSalud.indexOf(a);
+        if (idx != -1) {
+            administradoresCentroSalud.set(idx, b); return true;
+        }
+        return false;
+    }
+
+    public void borrarUsuario(Usuario u) {
+        if ( administradores.contains(u) ) {
+            administradores.remove(u);
+        } else if (medicos.contains(u) ) {
+            medicos.remove(u);
+        } else if (administradoresCentroSalud.contains(u) ) {
+            administradoresCentroSalud.remove(u);
+        }
+    }
+
+    @Override
+    public String toString() {
+        String s= "----ADMINISTRADORES----\n";
+        for (Admin a : administradores) {
+            s += a.toString();
+            s += "\n";
+        }
+
+        s += "-----GESTION CENTRO-----\n";
+        for (AdminCentroSalud ac : administradoresCentroSalud) {
+            s += ac.toString();
+            s += "\n";
+        }
+
+        s += "----MEDICOS----\n";
+        for (Medico m : medicos) {
+            s +=  m.toString();
+            s += "\n";
+        }
+        return s;
+    }
+}
